@@ -36,11 +36,12 @@ public class CameraController : MonoBehaviour
         else
         {
             var move = _moveAction.ReadValue<Vector2>();
-            var zoom = _zoomAction.ReadValue<float>();
 
             var moveSpeed = _zoomRelativeMoveSpeed * _camera.orthographicSize;
             _camera.transform.position += new Vector3(move.x, move.y, 0) * (moveSpeed * Time.deltaTime);
-            _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize - zoom, _minZoom, _maxZoom);
         }
+
+        var zoom = _zoomAction.ReadValue<float>();
+        _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize - zoom, _minZoom, _maxZoom);
     }
 }
