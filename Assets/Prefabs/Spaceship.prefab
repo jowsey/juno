@@ -58,15 +58,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 1631469073422597424}
-  LinkedParts:
-  - {fileID: 4498645341900223618}
-  - {fileID: 2967506728510518997}
-  - {fileID: 9087647239778868797}
-  - {fileID: 7770222274230885793}
-  - {fileID: 575209184574282953}
-  - {fileID: 883526407675222772}
-  - {fileID: 9120714228099940355}
-  - {fileID: 7481708063711268642}
 --- !u!1 &1403014666685350567
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,14 +203,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 0}
-  LinkedParts:
-  - {fileID: 411932529905426185}
-  - {fileID: 7651516646662775923}
-  - {fileID: 2767861782086274902}
-  - {fileID: 5914501753822495028}
-  - {fileID: 8726006432573628489}
-  - {fileID: 8853982569874459158}
-  - {fileID: 5700464735616051221}
 --- !u!1 &3815567468448094955
 GameObject:
   m_ObjectHideFlags: 0
@@ -274,7 +257,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -301,11 +284,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 0}
-  LinkedParts:
-  - {fileID: 67247196917120024}
-  - {fileID: 6645551921503422768}
-  - {fileID: 6345292930349080315}
-  - {fileID: 1375904883228702428}
 --- !u!114 &7247496989856108138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,9 +316,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlanetaryGravity
   _surfaceGravity: 9.81
   _airDensityFalloff: 5
-  _dragCoefficient: 8
-  _planetCore: {fileID: 0}
-  _planetAtmosphere: {fileID: 0}
+  _dragCoefficient: 20
 --- !u!1 &9145083670126403729
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,14 +372,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 0}
-  LinkedParts:
-  - {fileID: 4625447077859429413}
-  - {fileID: 2466636792952888642}
-  - {fileID: 7497541066304438911}
-  - {fileID: 3640914572590133409}
-  - {fileID: 2909948376255004605}
-  - {fileID: 4417131699629058636}
-  - {fileID: 2098366343728301364}
 --- !u!1001 &847804430764524076
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -466,17 +434,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 361985209092980699, guid: 5bef2807bb3004a858afe2e90206d8ff, type: 3}
   m_PrefabInstance: {fileID: 847804430764524076}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4625447077859429413 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5473248207869234697, guid: 5bef2807bb3004a858afe2e90206d8ff, type: 3}
-  m_PrefabInstance: {fileID: 847804430764524076}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd63ec78cc554057af6724fd84e2162d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BodyPart
 --- !u!1001 &1433406227778603391
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -665,17 +622,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
---- !u!114 &2967506728510518997 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3964539584276228835, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
-  m_PrefabInstance: {fileID: 2173668631629601846}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &8100321812999030756 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7944477144591555538, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
@@ -738,17 +684,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
---- !u!114 &2767861782086274902 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 2328224282188158318}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &3755707581005791702 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
@@ -811,17 +746,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
---- !u!114 &2098366343728301364 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4328067020616517451, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
-  m_PrefabInstance: {fileID: 2381989773991592575}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9e67ea33024e678ee254f8ffe5e84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Engine
 --- !u!4 &8904075488758753587 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
@@ -884,17 +808,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
---- !u!114 &2466636792952888642 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 2602422107551811450}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &3480401378401833922 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
@@ -957,17 +870,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
---- !u!114 &2909948376255004605 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 3334034433077749125}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &4185437401932443965 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
@@ -1030,17 +932,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
---- !u!114 &1375904883228702428 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4328067020616517451, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
-  m_PrefabInstance: {fileID: 3389046911355597207}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9e67ea33024e678ee254f8ffe5e84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Engine
 --- !u!4 &8473371356323879643 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
@@ -1107,17 +998,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
---- !u!114 &883526407675222772 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4328067020616517451, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
-  m_PrefabInstance: {fileID: 3481995613980515775}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9e67ea33024e678ee254f8ffe5e84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Engine
 --- !u!4 &7695999750383695603 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
@@ -1180,17 +1060,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
---- !u!114 &575209184574282953 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3964539584276228835, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
-  m_PrefabInstance: {fileID: 3530630842711143978}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &6827212756903734776 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7944477144591555538, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
@@ -1258,17 +1127,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
   m_PrefabInstance: {fileID: 3792532835200756377}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3640914572590133409 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 3792532835200756377}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &4281276069021200500
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1331,17 +1189,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
   m_PrefabInstance: {fileID: 4281276069021200500}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4417131699629058636 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 4281276069021200500}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &4792721992536147784
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1408,17 +1255,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
   m_PrefabInstance: {fileID: 4792721992536147784}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &9120714228099940355 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4328067020616517451, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
-  m_PrefabInstance: {fileID: 4792721992536147784}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9e67ea33024e678ee254f8ffe5e84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Engine
 --- !u!1001 &5227201330300675795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1476,17 +1312,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 726c0ae2328ff432dabc199e9052d8e9, type: 3}
---- !u!114 &4498645341900223618 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8567212019074781777, guid: 726c0ae2328ff432dabc199e9052d8e9, type: 3}
-  m_PrefabInstance: {fileID: 5227201330300675795}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd63ec78cc554057af6724fd84e2162d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BodyPart
 --- !u!4 &5978003143579349851 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1908573813968360840, guid: 726c0ae2328ff432dabc199e9052d8e9, type: 3}
@@ -1554,17 +1379,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7944477144591555538, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
   m_PrefabInstance: {fileID: 5267259634830701790}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &9087647239778868797 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3964539584276228835, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
-  m_PrefabInstance: {fileID: 5267259634830701790}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &5639518606454034688
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1622,17 +1436,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5bef2807bb3004a858afe2e90206d8ff, type: 3}
---- !u!114 &411932529905426185 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5473248207869234697, guid: 5bef2807bb3004a858afe2e90206d8ff, type: 3}
-  m_PrefabInstance: {fileID: 5639518606454034688}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd63ec78cc554057af6724fd84e2162d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BodyPart
 --- !u!4 &5423917154414669531 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 361985209092980699, guid: 5bef2807bb3004a858afe2e90206d8ff, type: 3}
@@ -1700,17 +1503,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
   m_PrefabInstance: {fileID: 6067017219557137164}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5914501753822495028 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 6067017219557137164}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &6612480376495523945
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1777,17 +1569,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
   m_PrefabInstance: {fileID: 6612480376495523945}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7481708063711268642 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4328067020616517451, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
-  m_PrefabInstance: {fileID: 6612480376495523945}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9e67ea33024e678ee254f8ffe5e84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Engine
 --- !u!1001 &6688267943712552770
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1850,17 +1631,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7944477144591555538, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
   m_PrefabInstance: {fileID: 6688267943712552770}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7770222274230885793 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3964539584276228835, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
-  m_PrefabInstance: {fileID: 6688267943712552770}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &6905621336367388527
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1984,17 +1754,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 09b9d76ce7f7c4802a4f1f27441f856d, type: 3}
---- !u!114 &67247196917120024 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7174407053489312199, guid: 09b9d76ce7f7c4802a4f1f27441f856d, type: 3}
-  m_PrefabInstance: {fileID: 7169297176880426463}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd63ec78cc554057af6724fd84e2162d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BodyPart
 --- !u!4 &633792527466801627 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7761350592745669636, guid: 09b9d76ce7f7c4802a4f1f27441f856d, type: 3}
@@ -2123,17 +1882,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
---- !u!114 &7651516646662775923 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 7784839054024048203}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &8671745253472266995 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
@@ -2263,17 +2011,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
---- !u!114 &7497541066304438911 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 7938286924905093191}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!4 &8825650529646185727 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
@@ -2341,17 +2078,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
   m_PrefabInstance: {fileID: 8290137901852225374}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5700464735616051221 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4328067020616517451, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
-  m_PrefabInstance: {fileID: 8290137901852225374}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9e67ea33024e678ee254f8ffe5e84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Engine
 --- !u!1001 &8527020270391372750
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2480,17 +2206,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6452739993571103706, guid: dba67046a1f594052b81adaca391bd79, type: 3}
   m_PrefabInstance: {fileID: 8762304104009531730}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6645551921503422768 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2711249899630872674, guid: dba67046a1f594052b81adaca391bd79, type: 3}
-  m_PrefabInstance: {fileID: 8762304104009531730}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &9005301750289944622
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2553,17 +2268,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
   m_PrefabInstance: {fileID: 9005301750289944622}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8853982569874459158 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 9005301750289944622}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &9056537803651733145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2626,17 +2330,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6452739993571103706, guid: dba67046a1f594052b81adaca391bd79, type: 3}
   m_PrefabInstance: {fileID: 9056537803651733145}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6345292930349080315 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2711249899630872674, guid: dba67046a1f594052b81adaca391bd79, type: 3}
-  m_PrefabInstance: {fileID: 9056537803651733145}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
 --- !u!1001 &9169303107168991857
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2699,14 +2392,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1464082759593235640, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
   m_PrefabInstance: {fileID: 9169303107168991857}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8726006432573628489 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 443296727787788856, guid: 03c05ae3c0e6e48a8970d3c069fee1c7, type: 3}
-  m_PrefabInstance: {fileID: 9169303107168991857}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank

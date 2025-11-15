@@ -116,7 +116,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.5
+      scalar: 3
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -747,7 +747,7 @@ ParticleSystem:
     m_TextureColorAffectsParticles: 1
     m_TextureAlphaAffectsParticles: 1
     m_TextureBilinearFiltering: 0
-    randomDirectionAmount: 0.25
+    randomDirectionAmount: 0.2
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
@@ -4995,7 +4995,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Engine
   BaseWeight: 50
   _flameParticles: {fileID: 7334149010486109296}
-  MaxThrust: 3000
+  MaxThrust: 36500
   FuelConsumptionRate: 65
   MaxRotation: 8
   RotationSpeed: 8

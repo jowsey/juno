@@ -27,7 +27,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _FadeExponent: 2
-    - _InnerRadius: 0.8
+    - _InnerRadius: 0.754
     - _UseFade: 1
     m_Colors: []
   m_BuildTextureStacks: []

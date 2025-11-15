@@ -248,7 +248,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.000027, y: -0.000012, z: 0}
-  m_LocalScale: {x: 1.35, y: 1.35, z: 1.35}
+  m_LocalScale: {x: 1.4999999, y: 1.4999999, z: 1.4999999}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2091774202}
@@ -737,7 +737,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 4300
+  m_Radius: 6000
 --- !u!1 &1916569364
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,7 +870,7 @@ Transform:
   m_GameObject: {fileID: 1916569364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 4305, z: -10}
+  m_LocalPosition: {x: 0, y: 10009, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -891,8 +891,8 @@ MonoBehaviour:
   _camera: {fileID: 1916569367}
   _followTarget: {fileID: 0}
   _zoomRelativeMoveSpeed: 1.5
-  _minZoom: 2
-  _maxZoom: 250
+  _minZoom: 5
+  _maxZoom: 300
 --- !u!1 &1958117405
 GameObject:
   m_ObjectHideFlags: 0
@@ -1055,7 +1055,7 @@ Transform:
   m_GameObject: {fileID: 1979771309}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 4300, z: 0}
+  m_LocalPosition: {x: 0, y: 10000, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1255,7 +1255,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 8600, y: 8600, z: 8600}
+  m_LocalScale: {x: 20000, y: 20000, z: 20000}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 432811301}
@@ -1269,6 +1269,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 97700066069472037, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.375
+      objectReference: {fileID: 0}
     - target: {fileID: 710132882649918085, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: _planetCore
       value: 
@@ -1299,7 +1303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4897214614216629070, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4312.072
+      value: 10012.072
       objectReference: {fileID: 0}
     - target: {fileID: 4897214614216629070, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1348,6 +1352,10 @@ PrefabInstance:
     - target: {fileID: 7481708063711268642, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7695999750383695603, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.375
       objectReference: {fileID: 0}
     - target: {fileID: 7707036771355045535, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
