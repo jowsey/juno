@@ -145,10 +145,13 @@ public class SpaceshipStage : MonoBehaviour
         gameObject.AddComponent<PlanetaryPhysics>();
 
         _rb = gameObject.AddComponent<Rigidbody2D>();
-        _rb.gravityScale = 0f;
         _rb.linearVelocity = parentRb.linearVelocity;
         _rb.angularVelocity = parentRb.angularVelocity;
-
+        _rb.angularDamping = 0f;
+        _rb.linearDamping = 0f;
+        _rb.gravityScale = 0f;
+        _rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
+        _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
         // detach from parent and tell it to recalculate children
         transform.SetParent(null);
