@@ -668,6 +668,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c6f6a70d61d641cc888c32e955bb6e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spaceship
+--- !u!4 &1423828635 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4897214614216629070, guid: e086e47e1897443f298d2392860d479a, type: 3}
+  m_PrefabInstance: {fileID: 6223979451903100424}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1852277583
 GameObject:
   m_ObjectHideFlags: 0
@@ -781,11 +786,11 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
+  m_RenderPostProcessing: 1
+  m_Antialiasing: 2
   m_AntialiasingQuality: 2
   m_StopNaN: 0
-  m_Dithering: 0
+  m_Dithering: 1
   m_ClearDepth: 1
   m_AllowXRRendering: 1
   m_AllowHDROutput: 1
@@ -889,7 +894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   _camera: {fileID: 1916569367}
-  _followTarget: {fileID: 0}
+  _followTarget: {fileID: 1423828635}
   _zoomRelativeMoveSpeed: 1.5
   _minZoom: 5
   _maxZoom: 300
