@@ -50,12 +50,16 @@ public class PlanetaryPhysics : MonoBehaviour
         var directionToTarget = (_env.EarthCore.position - transform.position).normalized;
         var gravity = directionToTarget * GetGravity();
 
-        _rb.AddForce(gravity, ForceMode2D.Force);
+        _rb.AddForce(gravity * _rb.mass, ForceMode2D.Force);
 
         // air resistance/drag
         var airDensity = GetAirDensity();
         var speed = _rb.linearVelocity.magnitude;
         var dragForce = -_rb.linearVelocity.normalized * (_dragCoefficient * airDensity * speed * speed);
         _rb.AddForce(dragForce, ForceMode2D.Force);
+
+        // angular drag
+        var angularDragTorque = -_rb.angularVelocity * 0.1f * airDensity;
+        _rb.AddTorque(angularDragTorque, ForceMode2D.Force);
     }
 }
