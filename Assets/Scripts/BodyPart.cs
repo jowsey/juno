@@ -10,7 +10,7 @@ public class BodyPart : MonoBehaviour
     private static ContactFilter2D _contactFilter;
     private static Collider2D[] _nearbyColliderResults = new Collider2D[10];
 
-    [SerializeField] private SpaceshipStage _parentStage;
+    private SpaceshipStage _parentStage;
 
     protected void Start()
     {
