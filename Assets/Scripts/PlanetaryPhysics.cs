@@ -6,7 +6,8 @@ public class PlanetaryPhysics : MonoBehaviour
 
     [SerializeField] private float _surfaceGravity = 9.81f;
     [SerializeField] private float _airDensityFalloff = 5f;
-    [SerializeField] private float _dragCoefficient = 8f;
+    [SerializeField] private float _dragCoefficient = 20f;
+    [SerializeField] private float _angularDragCoefficient = 100f;
 
     private static Environment _env;
 
@@ -52,14 +53,15 @@ public class PlanetaryPhysics : MonoBehaviour
 
         _rb.AddForce(gravity * _rb.mass, ForceMode2D.Force);
 
-        // air resistance/drag
+        // air resistance/linear drag
         var airDensity = GetAirDensity();
         var speed = _rb.linearVelocity.magnitude;
-        var dragForce = -_rb.linearVelocity.normalized * (_dragCoefficient * airDensity * speed * speed);
-        _rb.AddForce(dragForce, ForceMode2D.Force);
+        var drag = -_rb.linearVelocity.normalized * (_dragCoefficient * airDensity * speed * speed);
+        _rb.AddForce(drag, ForceMode2D.Force);
 
         // angular drag
-        var angularDragTorque = -_rb.angularVelocity * 0.1f * airDensity;
-        _rb.AddTorque(angularDragTorque, ForceMode2D.Force);
+        var angSpeed = Mathf.Abs(_rb.angularVelocity);
+        var angDrag = -Mathf.Sign(_rb.angularVelocity) * (_angularDragCoefficient * airDensity * angSpeed * angSpeed);
+        _rb.AddTorque(angDrag, ForceMode2D.Force);
     }
 }

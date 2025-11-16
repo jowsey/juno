@@ -1282,11 +1282,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 883526407675222772, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: SteeringControl
-      value: -0.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 899490076575679128, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1646513377222715510, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: m_Name
+      value: StageConnectorHorizontal
       objectReference: {fileID: 0}
     - target: {fileID: 2098366343728301364, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
@@ -1344,25 +1348,33 @@ PrefabInstance:
       propertyPath: ThrustControl
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7185386388827158804, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: m_Name
+      value: StageConnectorVertical
+      objectReference: {fileID: 0}
     - target: {fileID: 7481708063711268642, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7481708063711268642, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: SteeringControl
-      value: -0.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7707036771355045535, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8287002111592400037, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: m_Name
+      value: StageConnectorVertical
+      objectReference: {fileID: 0}
     - target: {fileID: 9120714228099940355, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9120714228099940355, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: SteeringControl
-      value: -0.05
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

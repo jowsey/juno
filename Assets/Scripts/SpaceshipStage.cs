@@ -9,7 +9,7 @@ public class SpaceshipStage : MonoBehaviour
     [SerializeField] private GameObject _fairing;
 
     [SerializeField] private Vector3 _separateDirection;
-    private const float SeparationForce = 2f;
+    private const float RelativeSeparationForce = 2f;
 
     [SerializeField] private bool _fixCenterOfMass = true;
 
@@ -49,9 +49,9 @@ public class SpaceshipStage : MonoBehaviour
 
         if (IsTopLevel && _allConnectedParts.Length == 0)
         {
-            // spaceship gone </3
+            // stage gone </3
             // todo end individual sim
-            Debug.Log("ship gone rip");
+            Debug.Log("stage gone rip");
             Destroy(gameObject);
         }
     }
@@ -74,11 +74,16 @@ public class SpaceshipStage : MonoBehaviour
 
         if (IsTopLevel && _fixCenterOfMass && _rb.centerOfMass.x != 0f)
         {
-            // fix issue with polygon colliders & center of mass precision
-            var com = _rb.centerOfMass;
-            com.x = 0f;
-            _rb.centerOfMass = com;
+            FixCenterOfMass();
         }
+    }
+
+    private void FixCenterOfMass()
+    {
+        // fix issue with polygon colliders & center of mass precision
+        var com = _rb.centerOfMass;
+        com.x = 0f;
+        _rb.centerOfMass = com;
     }
 
     private void FixedUpdate()
@@ -165,6 +170,8 @@ public class SpaceshipStage : MonoBehaviour
 
         IsTopLevel = true;
 
+        Destroy(_fairing);
+
         // store references before setting parent to null
         var parent = transform.parent;
         var parentRb = parent.GetComponentInParent<Rigidbody2D>();
@@ -185,11 +192,11 @@ public class SpaceshipStage : MonoBehaviour
         transform.SetParent(null);
         parent.GetComponentInParent<SpaceshipStage>().RecalculateLinkedParts();
 
+        RecalculateLinkedMass();
+
         // apply separation force
         var localDir = parent.TransformDirection(_separateDirection);
-        _rb.AddForce(localDir.normalized * SeparationForce, ForceMode2D.Impulse);
-
-        Destroy(_fairing);
+        _rb.AddForce(localDir.normalized * RelativeSeparationForce * _rb.mass, ForceMode2D.Impulse);
     }
 
     private void OnDrawGizmosSelected()
