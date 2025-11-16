@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd63ec78cc554057af6724fd84e2162d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BodyPart
-  BaseWeight: 5
+  BaseWeight: 0
 --- !u!61 &7862174137946548121
 BoxCollider2D:
   m_ObjectHideFlags: 0
