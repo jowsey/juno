@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,9 @@ public class SpaceshipStage : MonoBehaviour
 
     private Rigidbody2D _rb;
     [SerializeField] private GameObject _fairing;
+
+    [SerializeField] private Vector3 _separateDirection;
+    private const float SeparationForce = 2f;
 
     // Parts directly owned by this stage
     private List<BodyPart> _linkedParts = new();
@@ -157,6 +161,17 @@ public class SpaceshipStage : MonoBehaviour
         transform.SetParent(null);
         parent.GetComponentInParent<SpaceshipStage>().RecalculateLinkedParts();
 
+        // apply separation force
+        var localDir = parent.TransformDirection(_separateDirection);
+        _rb.AddForce(localDir.normalized * SeparationForce, ForceMode2D.Impulse);
+
         Destroy(_fairing);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        var worldDir = transform.TransformDirection(_separateDirection.normalized);
+        Gizmos.DrawLine(transform.position, transform.position + worldDir);
     }
 }

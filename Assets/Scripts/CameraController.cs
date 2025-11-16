@@ -5,6 +5,7 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
     [SerializeField] private Transform _followTarget;
+    [SerializeField] private Vector3 _localFollowOffset;
     [SerializeField] private float _zoomRelativeMoveSpeed = 1f;
     [SerializeField] private float _minZoom = 2;
     [SerializeField] private float _maxZoom = 100;
@@ -31,7 +32,7 @@ public class CameraController : MonoBehaviour
                 _followTarget.position.x,
                 _followTarget.position.y,
                 _camera.transform.position.z
-            );
+            ) + _followTarget.TransformVector(_localFollowOffset);
         }
         else
         {

@@ -58,6 +58,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 1631469073422597424}
+  _separateDirection: {x: 0, y: -1, z: 0}
 --- !u!1 &1403014666685350567
 GameObject:
   m_ObjectHideFlags: 0
@@ -203,6 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 0}
+  _separateDirection: {x: 1, y: 0, z: 0}
 --- !u!1 &3815567468448094955
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,6 +286,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 0}
+  _separateDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &7247496989856108138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,6 +375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
   IsTopLevel: 0
   _fairing: {fileID: 0}
+  _separateDirection: {x: -1, y: 0, z: 0}
 --- !u!1001 &847804430764524076
 PrefabInstance:
   m_ObjectHideFlags: 0
