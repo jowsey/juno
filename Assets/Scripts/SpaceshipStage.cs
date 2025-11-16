@@ -14,10 +14,13 @@ public class SpaceshipStage : MonoBehaviour
     [SerializeField] private bool _fixCenterOfMass = true;
 
     // Parts directly owned by this stage
-    private List<BodyPart> _linkedParts = new();
+    private List<BodyPart> _stageParts = new();
 
     // All parts connected to this stage (including child stages)
     private BodyPart[] _allConnectedParts;
+
+    private int _numEngines;
+
 
     private void Start()
     {
@@ -27,13 +30,18 @@ public class SpaceshipStage : MonoBehaviour
 
     public void RecalculateLinkedParts()
     {
-        _linkedParts.Clear();
+        _stageParts.Clear();
 
         foreach (Transform child in transform)
         {
             if (child.gameObject.activeInHierarchy && child.TryGetComponent<BodyPart>(out var part))
             {
-                _linkedParts.Add(part);
+                _stageParts.Add(part);
+
+                if (part is Engine)
+                {
+                    _numEngines++;
+                }
             }
         }
 
@@ -81,17 +89,19 @@ public class SpaceshipStage : MonoBehaviour
             RecalculateLinkedMass();
         }
 
-        var fuelAvailable = 0f;
-        foreach (var part in _linkedParts)
+        var linkedFuelAvailable = 0f;
+        foreach (var part in _stageParts)
         {
             if (part is FuelTank tank)
             {
-                fuelAvailable += tank.StoredFuelKg;
+                linkedFuelAvailable += tank.StoredFuelKg;
             }
         }
 
         var totalFuelUsage = 0f;
-        foreach (var part in _linkedParts)
+        // distribute fuel evenly among engines (prevents a tick where one engine runs and others dont)
+        var maxPerEngineFuelBudget = linkedFuelAvailable / Mathf.Max(1, _numEngines);
+        foreach (var part in _stageParts)
         {
             if (part is not Engine engine) continue;
 
@@ -115,19 +125,16 @@ public class SpaceshipStage : MonoBehaviour
                 engine.StoredZRot
             );
 
-            if (fuelAvailable <= 0f)
+            if (linkedFuelAvailable <= 0f || engine.ThrustControl <= 0f)
             {
                 engine.SetParticleRatio(0f);
                 continue;
             }
 
             var fuelUsage = engine.ThrustControl * engine.FuelConsumptionRate * Time.fixedDeltaTime;
-            var cappedThrust = engine.ThrustControl;
-            if (fuelAvailable < fuelUsage)
-            {
-                // limit thrust to remaining fuel
-                cappedThrust *= fuelAvailable / fuelUsage;
-            }
+            var cappedFuelUsage = Mathf.Min(fuelUsage, maxPerEngineFuelBudget);
+            var fuelAvailability = cappedFuelUsage / fuelUsage;
+            var cappedThrust = engine.ThrustControl * fuelAvailability;
 
             engine.SetParticleRatio(cappedThrust);
 
@@ -136,12 +143,12 @@ public class SpaceshipStage : MonoBehaviour
                 engine.transform.position
             );
 
-            fuelAvailable -= fuelUsage;
+            linkedFuelAvailable -= fuelUsage;
             totalFuelUsage += fuelUsage;
         }
 
         // consume fuel from tanks
-        foreach (var part in _linkedParts)
+        foreach (var part in _stageParts)
         {
             if (part is not FuelTank tank) continue;
 
