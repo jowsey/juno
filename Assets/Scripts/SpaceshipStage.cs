@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +10,8 @@ public class SpaceshipStage : MonoBehaviour
 
     [SerializeField] private Vector3 _separateDirection;
     private const float SeparationForce = 2f;
+
+    [SerializeField] private bool _fixCenterOfMass = true;
 
     // Parts directly owned by this stage
     private List<BodyPart> _linkedParts = new();
@@ -62,6 +63,14 @@ public class SpaceshipStage : MonoBehaviour
         }
 
         _rb.mass = totalMass;
+
+        if (IsTopLevel && _fixCenterOfMass && _rb.centerOfMass.x != 0f)
+        {
+            // fix issue with polygon colliders & center of mass precision
+            var com = _rb.centerOfMass;
+            com.x = 0f;
+            _rb.centerOfMass = com;
+        }
     }
 
     private void FixedUpdate()
