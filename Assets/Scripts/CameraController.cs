@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float _zoomRelativeMoveSpeed = 1f;
     [SerializeField] private float _minZoom = 2;
     [SerializeField] private float _maxZoom = 100;
+    [SerializeField] private float _timeScale = 1f;
 
     private InputAction _moveAction;
     private InputAction _zoomAction;
@@ -26,6 +27,8 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        Time.timeScale = _timeScale;
+
         if (_followTarget)
         {
             _camera.transform.position = new Vector3(

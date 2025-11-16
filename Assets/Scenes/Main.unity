@@ -898,7 +898,8 @@ MonoBehaviour:
   _localFollowOffset: {x: 0, y: -3, z: 0}
   _zoomRelativeMoveSpeed: 1.5
   _minZoom: 5
-  _maxZoom: 300
+  _maxZoom: 500
+  _timeScale: 1
 --- !u!1 &1958117405
 GameObject:
   m_ObjectHideFlags: 0
