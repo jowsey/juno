@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7425737744781917494}
   - component: {fileID: 343122713911733459}
+  - component: {fileID: 1463739019729118888}
   m_Layer: 7
   m_Name: LaunchStage
   m_TagString: Untagged
@@ -55,10 +56,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66550ed07d194cb4924dd9845ff84ca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
-  IsTopLevel: 0
+  IsRootStage: 0
   _fairing: {fileID: 1631469073422597424}
   _separateDirection: {x: 0, y: -1, z: 0}
   _fixCenterOfMass: 1
+--- !u!210 &1463739019729118888
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119643557244322108}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &1403014666685350567
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,6 +172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3648387676663260036}
   - component: {fileID: 2114942806489753056}
+  - component: {fileID: 6868356723998333108}
   m_Layer: 7
   m_Name: BoosterStageRight
   m_TagString: Untagged
@@ -202,10 +216,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66550ed07d194cb4924dd9845ff84ca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
-  IsTopLevel: 0
+  IsRootStage: 0
   _fairing: {fileID: 0}
   _separateDirection: {x: 1, y: 0, z: 0}
   _fixCenterOfMass: 1
+--- !u!210 &6868356723998333108
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2126214433808808093}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &3815567468448094955
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,6 +245,7 @@ GameObject:
   - component: {fileID: 8494693456446313500}
   - component: {fileID: 7247496989856108138}
   - component: {fileID: 710132882649918085}
+  - component: {fileID: 1083237447916173707}
   m_Layer: 7
   m_Name: Spaceship
   m_TagString: Untagged
@@ -285,7 +312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66550ed07d194cb4924dd9845ff84ca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
-  IsTopLevel: 0
+  IsRootStage: 0
   _fairing: {fileID: 0}
   _separateDirection: {x: 0, y: 0, z: 0}
   _fixCenterOfMass: 1
@@ -301,12 +328,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c6f6a70d61d641cc888c32e955bb6e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spaceship
-  _stageSets:
-  - Stages:
+  _useBrain: 1
+  PlanetaryPhysics: {fileID: 0}
+  _networkShape: 0a0000000800000004000000
+  _boosterStageGroup:
+    Stages:
     - {fileID: 8509284842110399341}
     - {fileID: 2114942806489753056}
-  - Stages:
+    Separated: 0
+  _firstStageGroup:
+    Stages:
     - {fileID: 343122713911733459}
+    Separated: 0
 --- !u!114 &710132882649918085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -323,6 +356,18 @@ MonoBehaviour:
   _airDensityFalloff: 5
   _dragCoefficient: 20
   _angularDragCoefficient: 100
+--- !u!210 &1083237447916173707
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3815567468448094955}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1 &9145083670126403729
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,6 +378,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3672696192361137524}
   - component: {fileID: 8509284842110399341}
+  - component: {fileID: 6287778042227889564}
   m_Layer: 7
   m_Name: BoosterStageLeft
   m_TagString: Untagged
@@ -376,10 +422,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66550ed07d194cb4924dd9845ff84ca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceshipStage
-  IsTopLevel: 0
+  IsRootStage: 0
   _fairing: {fileID: 0}
   _separateDirection: {x: -1, y: 0, z: 0}
   _fixCenterOfMass: 1
+--- !u!210 &6287778042227889564
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9145083670126403729}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!1001 &847804430764524076
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -522,11 +580,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 122340379801699038, guid: ea7fe421a681542d789849e007c41547, type: 3}
       propertyPath: m_Name
-      value: LaunchStageConnector
-      objectReference: {fileID: 0}
-    - target: {fileID: 122340379801699038, guid: ea7fe421a681542d789849e007c41547, type: 3}
-      propertyPath: m_IsActive
-      value: 1
+      value: StageConnectorHorizontal
       objectReference: {fileID: 0}
     - target: {fileID: 4634486503918216540, guid: ea7fe421a681542d789849e007c41547, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1824,7 +1878,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1576700893175452378, guid: c60a253aef7414480b52fd6475b5d616, type: 3}
       propertyPath: m_Name
-      value: StageConnectorVertical (1)
+      value: StageConnectorVertical
       objectReference: {fileID: 0}
     - target: {fileID: 1576700893175452378, guid: c60a253aef7414480b52fd6475b5d616, type: 3}
       propertyPath: m_IsActive
@@ -2151,7 +2205,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1576700893175452378, guid: c60a253aef7414480b52fd6475b5d616, type: 3}
       propertyPath: m_Name
-      value: StageConnectorVertical (1)
+      value: StageConnectorVertical
       objectReference: {fileID: 0}
     - target: {fileID: 2948227808441351923, guid: c60a253aef7414480b52fd6475b5d616, type: 3}
       propertyPath: m_LocalPosition.x

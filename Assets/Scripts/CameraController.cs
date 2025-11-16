@@ -9,7 +9,6 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float _zoomRelativeMoveSpeed = 1f;
     [SerializeField] private float _minZoom = 2;
     [SerializeField] private float _maxZoom = 100;
-    [SerializeField] private float _timeScale = 1f;
 
     private InputAction _moveAction;
     private InputAction _zoomAction;
@@ -27,8 +26,6 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        Time.timeScale = _timeScale;
-
         if (_followTarget)
         {
             _camera.transform.position = new Vector3(
@@ -42,7 +39,7 @@ public class CameraController : MonoBehaviour
             var move = _moveAction.ReadValue<Vector2>();
 
             var moveSpeed = _zoomRelativeMoveSpeed * _camera.orthographicSize;
-            _camera.transform.position += new Vector3(move.x, move.y, 0) * (moveSpeed * Time.deltaTime);
+            _camera.transform.position += new Vector3(move.x, move.y, 0) * (moveSpeed * Time.unscaledDeltaTime);
         }
 
         var zoom = _zoomAction.ReadValue<float>();
