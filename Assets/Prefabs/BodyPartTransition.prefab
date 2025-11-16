@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8567212019074781777}
   - component: {fileID: 5081434961493979489}
   - component: {fileID: 5922633840741665672}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BodyPartTransition
   m_TagString: Untagged
   m_Icon: {fileID: 0}

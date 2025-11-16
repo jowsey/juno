@@ -8,14 +8,14 @@ public class PlanetaryPhysics : MonoBehaviour
     [SerializeField] private float _airDensityFalloff = 5f;
     [SerializeField] private float _dragCoefficient = 8f;
 
-    private Environment _env;
+    private static Environment _env;
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _rb.gravityScale = 0f;
 
-        _env = FindAnyObjectByType<Environment>();
+        _env ??= FindAnyObjectByType<Environment>();
     }
 
     private float GetGravity()

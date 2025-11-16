@@ -1275,21 +1275,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 97700066069472037, guid: e086e47e1897443f298d2392860d479a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.375
-      objectReference: {fileID: 0}
-    - target: {fileID: 710132882649918085, guid: e086e47e1897443f298d2392860d479a, type: 3}
-      propertyPath: _planetCore
-      value: 
-      objectReference: {fileID: 2091774202}
-    - target: {fileID: 710132882649918085, guid: e086e47e1897443f298d2392860d479a, type: 3}
-      propertyPath: _planetAtmosphere
-      value: 
-      objectReference: {fileID: 432811301}
     - target: {fileID: 883526407675222772, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 883526407675222772, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: SteeringControl
+      value: -0.05
       objectReference: {fileID: 0}
     - target: {fileID: 899490076575679128, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1351,21 +1343,13 @@ PrefabInstance:
       propertyPath: ThrustControl
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6345292930349080315, guid: e086e47e1897443f298d2392860d479a, type: 3}
-      propertyPath: MaxFuel
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 6345292930349080315, guid: e086e47e1897443f298d2392860d479a, type: 3}
-      propertyPath: StoredFuel
-      value: 8
-      objectReference: {fileID: 0}
     - target: {fileID: 7481708063711268642, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7695999750383695603, guid: e086e47e1897443f298d2392860d479a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.375
+    - target: {fileID: 7481708063711268642, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: SteeringControl
+      value: -0.05
       objectReference: {fileID: 0}
     - target: {fileID: 7707036771355045535, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
@@ -1374,6 +1358,10 @@ PrefabInstance:
     - target: {fileID: 9120714228099940355, guid: e086e47e1897443f298d2392860d479a, type: 3}
       propertyPath: ThrustControl
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9120714228099940355, guid: e086e47e1897443f298d2392860d479a, type: 3}
+      propertyPath: SteeringControl
+      value: -0.05
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

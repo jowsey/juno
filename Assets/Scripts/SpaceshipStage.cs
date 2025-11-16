@@ -30,13 +30,21 @@ public class SpaceshipStage : MonoBehaviour
 
         foreach (Transform child in transform)
         {
-            if (child.TryGetComponent<BodyPart>(out var part))
+            if (child.gameObject.activeInHierarchy && child.TryGetComponent<BodyPart>(out var part))
             {
                 _linkedParts.Add(part);
             }
         }
 
         _allConnectedParts = GetComponentsInChildren<BodyPart>();
+
+        if (IsTopLevel && _allConnectedParts.Length == 0)
+        {
+            // spaceship gone </3
+            // todo end individual sim
+            Debug.Log("ship gone rip");
+            Destroy(gameObject);
+        }
     }
 
     private void RecalculateLinkedMass()

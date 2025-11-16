@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7425737744781917494}
   - component: {fileID: 343122713911733459}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LaunchStage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30,7 +30,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7832149159164091821}
   - {fileID: 6285393643174793204}
   - {fileID: 5978003143579349851}
   - {fileID: 8100321812999030756}
@@ -69,7 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7832149159164091821}
   - component: {fileID: 4351973724059830426}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: JowseyAerospaceLogo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,12 +83,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1403014666685350567}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -3.5625, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -0.7871094, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7425737744781917494}
+  m_Father: {fileID: 2835406721558556428}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!212 &4351973724059830426
 SpriteRenderer:
@@ -159,7 +158,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3648387676663260036}
   - component: {fileID: 2114942806489753056}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BoosterStageRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -218,7 +217,7 @@ GameObject:
   - component: {fileID: 8494693456446313500}
   - component: {fileID: 7247496989856108138}
   - component: {fileID: 710132882649918085}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Spaceship
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -330,7 +329,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3672696192361137524}
   - component: {fileID: 8509284842110399341}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BoosterStageLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -955,7 +954,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.5
+      value: -0.375
       objectReference: {fileID: 0}
     - target: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1375,7 +1374,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7944477144591555538, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7832149159164091821}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c8e2840d954c44f37b8101a920ade6c0, type: 3}
 --- !u!4 &2835406721558556428 stripped
@@ -1521,7 +1523,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5
+      value: 0.375
       objectReference: {fileID: 0}
     - target: {fileID: 6529980244803955532, guid: bee8f177568ac4e99930b8cd5a77745b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1939,9 +1941,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6727270693565631204, guid: 658c3546dbfcb4ddc95fa93dd6008668, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8815099047743134766, guid: 658c3546dbfcb4ddc95fa93dd6008668, type: 3}
       propertyPath: m_Name
-      value: BodyPart
+      value: Fairing
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

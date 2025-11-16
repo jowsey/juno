@@ -100,3 +100,7 @@ InitTestScene*.unity*
 
 # JetBrains
 .idea/
+
+# Crash recovery files
+/[Aa]ssets/_Recovery
+/[Aa]ssets/_Recovery.meta

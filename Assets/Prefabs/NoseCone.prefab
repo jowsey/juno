@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9146989327106293689}
   - component: {fileID: 2624337075311835354}
   - component: {fileID: 1308979441966204248}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: NoseCone
   m_TagString: Untagged
   m_Icon: {fileID: 0}

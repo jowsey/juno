@@ -22,8 +22,10 @@ public class Engine : BodyPart
 
     public float StoredZRot;
 
-    private void Start()
+    private new void Start()
     {
+        base.Start();
+
         _initialParticleRateOverTime = _flameParticles.emission.rateOverTime.constant;
 
         var emission = _flameParticles.emission;
