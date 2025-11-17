@@ -243,9 +243,8 @@ namespace Ship
             Rb = gameObject.AddComponent<Rigidbody2D>();
             Rb.linearVelocity = inheritedLinearVelocity;
             Rb.angularVelocity = inheritedAngularVelocity;
-            Rb.angularDamping = 0f;
             Rb.linearDamping = 0f;
-            Rb.gravityScale = 0f;
+            Rb.angularDamping = 0f;
             Rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
             Rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
