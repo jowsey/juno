@@ -276,10 +276,10 @@ namespace Ship
             }
 
             gameObject.SetActive(true);
+
+            // reinitialise parts directly owned by this stage, child stages handle their own parts
             foreach (var part in _stageParts)
             {
-                // we only have to reset parts directly owned by this stage, child stages handle their own parts
-                // (also, _allOwnedParts won't have inactive parts, so it would be useless here)
                 part.Reinitialise();
             }
 
