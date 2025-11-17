@@ -47,7 +47,7 @@ namespace Ship
             ThrustControl = 0f;
             SteeringControl = 0f;
             StoredZRot = 0f;
-            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
         }
     }
 }
