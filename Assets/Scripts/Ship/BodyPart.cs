@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ship
@@ -11,7 +12,7 @@ namespace Ship
         private const float ChainRadius = 2.5f;
         private static GameObject _explosionPrefab;
         private static ContactFilter2D _contactFilter;
-        private static Collider2D[] _nearbyParts = new Collider2D[10];
+        private static List<Collider2D> _nearbyParts = new();
 
         public SpaceshipStage Stage { get; private set; }
 
