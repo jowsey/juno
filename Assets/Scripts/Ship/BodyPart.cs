@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace Ship
         public float BaseWeight;
 
         private const float CrashVelocityThreshold = 5f;
+        private const float RotationVelocityExplodeThreshold = 1800f;
         private const float ChainRadius = 2.5f;
         private static GameObject _explosionPrefab;
         private static ContactFilter2D _contactFilter;
@@ -25,6 +27,15 @@ namespace Ship
             }
 
             Stage = GetComponentInParent<SpaceshipStage>();
+        }
+
+        private void FixedUpdate()
+        {
+            // explode if rotating too fast (ripped apart by force)
+            if (Mathf.Abs(Stage.Rb.angularVelocity) >= RotationVelocityExplodeThreshold)
+            {
+                Stage.StartCoroutine(Explode());
+            }
         }
 
         public IEnumerator Explode()

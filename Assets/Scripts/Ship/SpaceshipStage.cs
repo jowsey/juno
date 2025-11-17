@@ -16,7 +16,7 @@ namespace Ship
         private Quaternion _originalLocalRotation;
 
         // rigidbody we contribute to, either our parent's or our own when separated
-        private Rigidbody2D _rb;
+        public Rigidbody2D Rb { get; private set; }
 
         // true if we're not connected to any stage above us (i.e. we own our physics)
         [HideInInspector] public bool IsRootStage;
@@ -41,7 +41,7 @@ namespace Ship
             Ship = GetComponentInParent<SpaceshipController>();
             _parentStage = transform.parent?.GetComponentInParent<SpaceshipStage>();
 
-            _rb = Ship.Rb;
+            Rb = Ship.Rb;
 
             _originalParent = transform.parent;
             _originalLocalPosition = transform.localPosition;
@@ -96,9 +96,9 @@ namespace Ship
                 }
             }
 
-            _rb.mass = totalMass;
+            Rb.mass = totalMass;
 
-            if (_fixCenterOfMass && _rb.centerOfMass.x != 0f)
+            if (_fixCenterOfMass && Rb.centerOfMass.x != 0f)
             {
                 FixCenterOfMass();
             }
@@ -107,9 +107,9 @@ namespace Ship
         private void FixCenterOfMass()
         {
             // fix issue with polygon colliders & center of mass precision
-            var com = _rb.centerOfMass;
+            var com = Rb.centerOfMass;
             com.x = 0f;
-            _rb.centerOfMass = com;
+            Rb.centerOfMass = com;
         }
 
         // normalized amount of fuel remaining relative to max
@@ -196,7 +196,7 @@ namespace Ship
 
                 engine.SetParticleRatio(cappedThrust);
 
-                _rb.AddForceAtPosition(
+                Rb.AddForceAtPosition(
                     engine.transform.up * (cappedThrust * engine.MaxThrust),
                     engine.transform.position
                 );
@@ -232,22 +232,22 @@ namespace Ship
                 }
             }
 
-            var inheritedLinearVelocity = _rb.linearVelocity;
-            var inheritedAngularVelocity = _rb.angularVelocity;
+            var inheritedLinearVelocity = Rb.linearVelocity;
+            var inheritedAngularVelocity = Rb.angularVelocity;
 
             // detach from parent and tell it to rescan parts (we took some with us)
             transform.SetParent(Ship.transform.parent);
             _parentStage.RescanParts();
 
             // become our own physics object
-            _rb = gameObject.AddComponent<Rigidbody2D>();
-            _rb.linearVelocity = inheritedLinearVelocity;
-            _rb.angularVelocity = inheritedAngularVelocity;
-            _rb.angularDamping = 0f;
-            _rb.linearDamping = 0f;
-            _rb.gravityScale = 0f;
-            _rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
-            _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            Rb = gameObject.AddComponent<Rigidbody2D>();
+            Rb.linearVelocity = inheritedLinearVelocity;
+            Rb.angularVelocity = inheritedAngularVelocity;
+            Rb.angularDamping = 0f;
+            Rb.linearDamping = 0f;
+            Rb.gravityScale = 0f;
+            Rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
+            Rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
             RecalculateLinkedMass();
 
@@ -255,7 +255,7 @@ namespace Ship
 
             // apply separation force
             var localDir = _parentStage.transform.TransformDirection(_separateDirection);
-            _rb.AddForce(localDir.normalized * (RelativeSeparationForce * _rb.mass), ForceMode2D.Impulse);
+            Rb.AddForce(localDir.normalized * (RelativeSeparationForce * Rb.mass), ForceMode2D.Impulse);
         }
 
         private void OnDrawGizmosSelected()
@@ -271,9 +271,9 @@ namespace Ship
             if (IsRootStage && _parentStage)
             {
                 Destroy(GetComponent<PlanetaryPhysics>());
-                Destroy(_rb);
+                Destroy(Rb);
 
-                _rb = Ship.Rb;
+                Rb = Ship.Rb;
                 IsRootStage = false;
             }
 

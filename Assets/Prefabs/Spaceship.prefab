@@ -351,11 +351,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b1b6bc69e0b484ca60675bc4e743068, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlanetaryGravity
-  _surfaceGravity: 9.81
+  m_EditorClassIdentifier: Assembly-CSharp::Ship.PlanetaryPhysics
   _airDensityFalloff: 5
   _dragCoefficient: 20
-  _angularDragCoefficient: 100
+  _angularDamping: 100
 --- !u!210 &1083237447916173707
 SortingGroup:
   m_ObjectHideFlags: 0

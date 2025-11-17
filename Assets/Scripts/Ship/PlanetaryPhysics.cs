@@ -5,14 +5,14 @@ namespace Ship
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlanetaryPhysics : MonoBehaviour
     {
-        private Rigidbody2D _rb;
+        private const float SurfaceGravity = 9.81f;
 
-        [SerializeField] private float _surfaceGravity = 9.81f;
+        private Rigidbody2D _rb;
+        private static Environment _env;
+
         [SerializeField] private float _airDensityFalloff = 5f;
         [SerializeField] private float _dragCoefficient = 20f;
-        [SerializeField] private float _angularDragCoefficient = 100f;
-
-        private static Environment _env;
+        [SerializeField] private float _angularDamping = 100f;
 
         private void Awake()
         {
@@ -45,20 +45,13 @@ namespace Ship
 
             var r = Mathf.Max(distanceToCore, planetRadius);
 
-            return _surfaceGravity * (planetRadius * planetRadius) / (r * r);
+            return SurfaceGravity * (planetRadius * planetRadius) / (r * r);
         }
 
         public float GetAirDensity()
         {
-            if (_rb.linearVelocity.sqrMagnitude < 0.001f) return 0f;
-
             var progress = GetAtmosphereProgress();
-
-            // above atmosphere
-            if (progress >= 1f) return 0f;
-
-            var airDensity = Mathf.Exp(-_airDensityFalloff * progress);
-            return airDensity;
+            return progress < 1f ? Mathf.Exp(-_airDensityFalloff * progress) : 0f;
         }
 
         private void FixedUpdate()
@@ -76,9 +69,7 @@ namespace Ship
             _rb.AddForce(drag, ForceMode2D.Force);
 
             // angular drag
-            var angSpeed = Mathf.Abs(_rb.angularVelocity);
-            var angDrag = -Mathf.Sign(_rb.angularVelocity) * (_angularDragCoefficient * airDensity * angSpeed * angSpeed);
-            _rb.AddTorque(angDrag, ForceMode2D.Force);
+            _rb.angularDamping = _angularDamping * airDensity;
         }
     }
 }
