@@ -31,6 +31,7 @@ namespace Ship
         // parts directly owned by this stage
         private List<BodyPart> _stageParts = new();
         private List<Engine> _engines = new();
+        private List<FuelTank> _fuelTanks = new();
 
         // all parts connected to this stage (including child stages)
         private List<BodyPart> _allOwnedParts = new();
@@ -53,6 +54,7 @@ namespace Ship
         {
             _stageParts.Clear();
             _engines.Clear();
+            _fuelTanks.Clear();
 
             foreach (Transform child in transform)
             {
@@ -60,6 +62,7 @@ namespace Ship
                 {
                     _stageParts.Add(part);
                     if (part is Engine engine) _engines.Add(engine);
+                    if (part is FuelTank tank) _fuelTanks.Add(tank);
                 }
             }
 
@@ -84,6 +87,8 @@ namespace Ship
             var totalMass = 0f;
             foreach (var part in _allOwnedParts)
             {
+                if (!part.isActiveAndEnabled) continue;
+
                 totalMass += part.BaseWeight;
                 if (part is FuelTank tank)
                 {
@@ -113,9 +118,9 @@ namespace Ship
             var totalFuel = 0f;
             var totalFuelCapacity = 0f;
 
-            foreach (var part in _stageParts)
+            foreach (var tank in _fuelTanks)
             {
-                if (part is not FuelTank tank) continue;
+                if (!tank.isActiveAndEnabled) continue;
 
                 totalFuel += tank.StoredFuelKg;
                 totalFuelCapacity += tank.MaxFuelKg;
@@ -150,6 +155,8 @@ namespace Ship
             var linkedFuelAvailable = 0f;
             foreach (var part in _stageParts)
             {
+                if (!part.isActiveAndEnabled) continue;
+
                 if (part is FuelTank tank)
                 {
                     linkedFuelAvailable += tank.StoredFuelKg;
@@ -161,15 +168,10 @@ namespace Ship
             var maxPerEngineFuelBudget = linkedFuelAvailable / Mathf.Max(1, _engines.Count);
             foreach (var engine in _engines)
             {
+                if (!engine.isActiveAndEnabled) continue;
+
                 // handle steering rotation
-                var targetRot = engine.SteeringControl * engine.MaxRotation;
-                var diff = targetRot - engine.StoredZRot;
-                var maxRotChange = engine.RotationSpeed * Time.fixedDeltaTime;
-                var rotationChange = Mathf.Clamp(
-                    diff,
-                    -maxRotChange,
-                    maxRotChange
-                );
+                var rotationChange = engine.SteeringControl * engine.RotationSpeed * Time.fixedDeltaTime;
                 engine.StoredZRot = Mathf.Clamp(
                     engine.StoredZRot + rotationChange,
                     -engine.MaxRotation,
@@ -199,14 +201,14 @@ namespace Ship
                     engine.transform.position
                 );
 
-                linkedFuelAvailable -= fuelUsage;
-                totalFuelUsage += fuelUsage;
+                linkedFuelAvailable -= cappedFuelUsage;
+                totalFuelUsage += cappedFuelUsage;
             }
 
             // consume fuel from tanks
             foreach (var part in _stageParts)
             {
-                if (part is not FuelTank tank) continue;
+                if (!part.isActiveAndEnabled || part is not FuelTank tank) continue;
 
                 var fuelToConsume = Mathf.Min(tank.StoredFuelKg, totalFuelUsage);
                 tank.StoredFuelKg -= fuelToConsume;
