@@ -66,9 +66,6 @@ namespace Ship
 
         private void Start()
         {
-            // mitigate unity physics glitch on initialise
-            Rb.rotation = 0f;
-
             Debug.Log("Creating brain with shape " + string.Join("-", _networkShape));
             Brain = new NeuralNetwork(_networkShape);
         }
