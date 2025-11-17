@@ -43,6 +43,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
@@ -100,6 +101,9 @@ InitTestScene*.unity*
 
 # JetBrains
 .idea/
+
+# Vscode
+.vscode/
 
 # Crash recovery files
 /[Aa]ssets/_Recovery
