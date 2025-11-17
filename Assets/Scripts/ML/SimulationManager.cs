@@ -83,8 +83,11 @@ namespace ML
 
                 foreach (var ship in _population)
                 {
+                    ship.Rb.MovePositionAndRotation(_spawnPosition, Quaternion.identity);
                     ship.Reinitialise();
                 }
+                
+                Physics2D.SyncTransforms();
 
                 yield return new WaitForSeconds(_generationDuration);
 

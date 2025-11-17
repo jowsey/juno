@@ -158,8 +158,7 @@ namespace Ship
         {
             Rb.linearVelocity = Vector2.zero;
             Rb.angularVelocity = 0f;
-            Rb.rotation = 0f;
-
+            
             gameObject.SetActive(true);
 
             _topLevelStage.Reinitialise();
