@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
         _zoomAction = InputSystem.actions.FindAction("Zoom");
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (_followTarget)
         {
