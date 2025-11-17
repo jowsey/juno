@@ -39,21 +39,15 @@ namespace Ship
             var found = Physics2D.OverlapCircle(transform.position, ChainRadius, _contactFilter, _nearbyParts);
             for (var i = 0; i < found; i++)
             {
-                // coroutines are weirdly async? if we put this check above overlapcircle,
-                // it can become inactive between then and now, so we just check later and suck up the
-                // potentially unnecessary overlapcircle call
-                // todo this whole section can definitely be cleaned up
-                if (!Stage.isActiveAndEnabled) yield break;
-
                 var other = _nearbyParts[i];
-                if (!other.isActiveAndEnabled) continue; // already destroyed (also avoids self)
+                if (!other.isActiveAndEnabled) continue; // already destroyed by another explosion this frame
 
                 if (!other.TryGetComponent<BodyPart>(out var otherPart)) continue;
 
                 // don't explode other ships' parts
                 if (otherPart.Stage.Ship != Stage.Ship) continue;
 
-                Stage.StartCoroutine(otherPart.Explode());
+                otherPart.Stage.StartCoroutine(otherPart.Explode());
             }
         }
 
