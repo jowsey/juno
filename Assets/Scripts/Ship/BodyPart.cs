@@ -13,7 +13,7 @@ namespace Ship
         private static ContactFilter2D _contactFilter;
         private static Collider2D[] _nearbyParts = new Collider2D[10];
 
-        private SpaceshipStage _stage;
+        public SpaceshipStage Stage { get; private set; }
 
         protected void Awake()
         {
@@ -23,7 +23,7 @@ namespace Ship
                 _contactFilter.SetLayerMask(LayerMask.GetMask("Spaceship"));
             }
 
-            _stage = GetComponentInParent<SpaceshipStage>();
+            Stage = GetComponentInParent<SpaceshipStage>();
         }
 
         public IEnumerator Explode()
@@ -31,7 +31,7 @@ namespace Ship
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
 
             gameObject.SetActive(false);
-            _stage.CheckForDestruction();
+            Stage.CheckForDestruction();
 
             // chain reaction to nearby parts
             yield return new WaitForFixedUpdate();
@@ -43,27 +43,26 @@ namespace Ship
                 // it can become inactive between then and now, so we just check later and suck up the
                 // potentially unnecessary overlapcircle call
                 // todo this whole section can definitely be cleaned up
-                if (!_stage.isActiveAndEnabled) yield break;
+                if (!Stage.isActiveAndEnabled) yield break;
 
                 var other = _nearbyParts[i];
                 if (!other.isActiveAndEnabled) continue; // already destroyed (also avoids self)
 
-                // don't explode other ships' parts
-                if (other.GetComponentInParent<SpaceshipStage>().Ship != _stage.Ship) continue;
+                if (!other.TryGetComponent<BodyPart>(out var otherPart)) continue;
 
-                if (other.TryGetComponent<BodyPart>(out var part))
-                {
-                    _stage.StartCoroutine(part.Explode());
-                }
+                // don't explode other ships' parts
+                if (otherPart.Stage.Ship != Stage.Ship) continue;
+
+                Stage.StartCoroutine(otherPart.Explode());
             }
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.relativeVelocity.magnitude < CrashVelocityThreshold) return;
-            if (!_stage.isActiveAndEnabled) return; // todo check if needed
+            if (!Stage.isActiveAndEnabled) return; // todo check if needed
 
-            _stage.StartCoroutine(Explode());
+            Stage.StartCoroutine(Explode());
         }
 
         public virtual void Reinitialise()
