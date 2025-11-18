@@ -4942,7 +4942,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Engine
   BaseWeight: 50
   _flameParticles: {fileID: 7334149010486109296}
-  MaxThrust: 12000
+  MaxThrust: 36500
   FuelConsumptionRate: 65
   MaxRotation: 8
   RotationSpeed: 8

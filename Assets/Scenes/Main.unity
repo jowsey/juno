@@ -857,7 +857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ML.SimulationManager
   _maxGenerations: 200
   _populationSize: 100
-  _trainingTimeScale: 30
+  _trainingTimeScale: 5
   _generationDuration: 120
   _eliteCount: 5
   _mutationRate: 0.05
