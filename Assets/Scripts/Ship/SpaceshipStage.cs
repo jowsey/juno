@@ -93,21 +93,8 @@ namespace Ship
             }
 
             GetComponentsInChildren<BodyPart>(_allOwnedParts);
-            CheckForDestruction();
 
             RecalculateLinkedMass();
-        }
-
-        public void CheckForDestruction()
-        {
-            if (!_allOwnedParts.Any(part => part.isActiveAndEnabled))
-            {
-                // stage fully destroyed, we have no further use
-                gameObject.SetActive(false);
-
-                // propagate up the ship
-                if (_parentStage) _parentStage.CheckForDestruction();
-            }
         }
 
         private void RecalculateLinkedMass()
@@ -115,8 +102,6 @@ namespace Ship
             var totalMass = 0f;
             foreach (var part in _allOwnedParts)
             {
-                if (!part.isActiveAndEnabled) continue;
-
                 totalMass += part.BaseWeight;
                 if (part is FuelTank tank)
                 {
@@ -143,8 +128,6 @@ namespace Ship
 
             foreach (var tank in _fuelTanks)
             {
-                if (!tank.isActiveAndEnabled) continue;
-
                 totalFuel += tank.StoredFuelKg;
                 totalFuelCapacity += tank.MaxFuelKg;
             }
@@ -173,8 +156,6 @@ namespace Ship
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.relativeVelocity.magnitude < CrashVelocityThreshold) return;
-            if (!isActiveAndEnabled) return; // todo check if needed
-
             Explode();
         }
 
@@ -187,13 +168,9 @@ namespace Ship
                 return;
             }
 
-            // recalculate mass if root stage
-            // if (IsRootStage) RecalculateLinkedMass();
-
             var linkedFuelAvailable = 0f;
             foreach (var tank in _fuelTanks)
             {
-                if (!tank.isActiveAndEnabled) continue;
                 linkedFuelAvailable += tank.StoredFuelKg;
             }
 
@@ -202,8 +179,6 @@ namespace Ship
             var maxPerEngineFuelBudget = linkedFuelAvailable / Mathf.Max(1, _engines.Count);
             foreach (var engine in _engines)
             {
-                if (!engine.isActiveAndEnabled) continue;
-
                 var engineTransform = engine.transform;
 
                 // handle steering rotation
@@ -240,14 +215,12 @@ namespace Ship
             // consume fuel from tanks
             foreach (var tank in _fuelTanks)
             {
-                if (!tank.isActiveAndEnabled) continue;
-
                 var fuelToConsume = Mathf.Min(tank.StoredFuelKg, totalFuelUsage);
                 tank.StoredFuelKg -= fuelToConsume;
                 totalFuelUsage -= fuelToConsume;
                 if (totalFuelUsage <= 0f) break;
             }
-            
+
             Rb.mass -= totalFuelUsage;
         }
 
