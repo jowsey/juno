@@ -811,8 +811,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Environment
   <EarthCore>k__BackingField: {fileID: 2091774202}
   <EarthAtmosphere>k__BackingField: {fileID: 432811301}
-  <EarthCoreRadius>k__BackingField: 0
-  <EarthAtmosphereRadius>k__BackingField: 0
 --- !u!1 &1321753765
 GameObject:
   m_ObjectHideFlags: 0

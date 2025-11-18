@@ -36,6 +36,7 @@ namespace Ship
         // parts directly owned by this stage
         private List<BodyPart> _stageParts = new();
         private List<Engine> _engines = new();
+        private List<Transform> _engineTransforms = new();
         private List<FuelTank> _fuelTanks = new();
 
         // all parts connected to this stage (including child stages)
@@ -81,6 +82,7 @@ namespace Ship
         {
             _stageParts.Clear();
             _engines.Clear();
+            _engineTransforms.Clear();
             _fuelTanks.Clear();
 
             foreach (Transform child in transform)
@@ -88,7 +90,12 @@ namespace Ship
                 if (!child.TryGetComponent<BodyPart>(out var part)) continue;
                 _stageParts.Add(part);
 
-                if (part is Engine engine) _engines.Add(engine);
+                if (part is Engine engine)
+                {
+                    _engines.Add(engine);
+                    _engineTransforms.Add(engine.transform);
+                }
+
                 if (part is FuelTank tank) _fuelTanks.Add(tank);
             }
 
@@ -126,8 +133,9 @@ namespace Ship
             var totalFuel = 0f;
             var totalFuelCapacity = 0f;
 
-            foreach (var tank in _fuelTanks)
+            for (var i = 0; i < _fuelTanks.Count; i++)
             {
+                var tank = _fuelTanks[i];
                 totalFuel += tank.StoredFuelKg;
                 totalFuelCapacity += tank.MaxFuelKg;
             }
@@ -139,16 +147,18 @@ namespace Ship
 
         public void SetThrustControl(float level)
         {
-            foreach (var engine in _engines)
+            for (var i = 0; i < _engines.Count; i++)
             {
+                var engine = _engines[i];
                 engine.ThrustControl = Mathf.Clamp01(level);
             }
         }
 
         public void SetSteeringControl(float level)
         {
-            foreach (var engine in _engines)
+            for (var i = 0; i < _engines.Count; i++)
             {
+                var engine = _engines[i];
                 engine.SteeringControl = Mathf.Clamp(level, -1f, 1f);
             }
         }
@@ -169,26 +179,33 @@ namespace Ship
             }
 
             var linkedFuelAvailable = 0f;
-            foreach (var tank in _fuelTanks)
+            for (var i = 0; i < _fuelTanks.Count; i++)
             {
+                var tank = _fuelTanks[i];
                 linkedFuelAvailable += tank.StoredFuelKg;
             }
 
             var totalFuelUsage = 0f;
             // distribute fuel evenly among engines (prevents a tick where one engine runs and others dont)
             var maxPerEngineFuelBudget = linkedFuelAvailable / Mathf.Max(1, _engines.Count);
-            foreach (var engine in _engines)
+            for (var i = 0; i < _engines.Count; i++)
             {
-                var engineTransform = engine.transform;
+                var engine = _engines[i];
+                var engineTransform = _engineTransforms[i];
 
                 // handle steering rotation
                 var rotationChange = engine.SteeringControl * engine.RotationSpeed * Time.fixedDeltaTime;
-                engine.StoredZRot = Mathf.Clamp(
+                var newZRot = Mathf.Clamp(
                     engine.StoredZRot + rotationChange,
                     -engine.MaxRotation,
                     engine.MaxRotation
                 );
-                engineTransform.localRotation = Quaternion.Euler(0f, 0f, engine.StoredZRot);
+
+                if (Mathf.Abs(newZRot - engine.StoredZRot) > Mathf.Epsilon)
+                {
+                    engine.StoredZRot = newZRot;
+                    engineTransform.localRotation = Quaternion.Euler(0f, 0f, engine.StoredZRot);
+                }
 
                 if (linkedFuelAvailable <= 0f || engine.ThrustControl <= 0f)
                 {
@@ -213,8 +230,10 @@ namespace Ship
             }
 
             // consume fuel from tanks
-            foreach (var tank in _fuelTanks)
+            for (var i = 0; i < _fuelTanks.Count; i++)
             {
+                var tank = _fuelTanks[i];
+
                 var fuelToConsume = Mathf.Min(tank.StoredFuelKg, totalFuelUsage);
                 tank.StoredFuelKg -= fuelToConsume;
                 totalFuelUsage -= fuelToConsume;

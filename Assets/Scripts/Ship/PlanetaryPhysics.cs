@@ -22,44 +22,46 @@ namespace Ship
             _rb.gravityScale = 0f;
         }
 
-        public float GetAltitude()
+        public float GetAltitude(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(transform.position, _env.EarthCore.position);
+            var distanceToCore = Vector2.Distance(position, _env.EarthCorePosition);
             var altitude = distanceToCore - _env.EarthCoreRadius;
             return Mathf.Max(0f, altitude);
         }
 
-        public float GetAtmosphereProgress()
+        public float GetAtmosphereProgress(Vector2 position)
         {
-            var distanceToCenter = Vector2.Distance(transform.position, _env.EarthCore.position);
+            var distanceToCore = Vector2.Distance(position, _env.EarthCorePosition);
             return Mathf.Clamp01(
-                (distanceToCenter - _env.EarthCoreRadius) / (_env.EarthAtmosphereRadius - _env.EarthCoreRadius)
+                (distanceToCore - _env.EarthCoreRadius) / (_env.EarthAtmosphereRadius - _env.EarthCoreRadius)
             );
         }
 
-        public float GetGravity()
+        public float GetGravity(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(transform.position, _env.EarthCore.position);
+            var distanceToCore = Vector2.Distance(position, _env.EarthCorePosition);
             var r = Mathf.Max(distanceToCore, _env.EarthCoreRadius);
             return SurfaceGravity * (_env.EarthCoreRadius * _env.EarthCoreRadius) / (r * r);
         }
 
-        public float GetAirDensity()
+        public float GetAirDensity(Vector2 position)
         {
-            var progress = GetAtmosphereProgress();
+            var progress = GetAtmosphereProgress(position);
             return progress < 1f ? Mathf.Exp(-_airDensityFalloff * progress) : 0f;
         }
 
         private void FixedUpdate()
         {
+            var position = _rb.position;
+
             // gravity
-            var directionToTarget = (_env.EarthCore.position - transform.position).normalized;
-            var gravity = directionToTarget * GetGravity();
+            var directionToTarget = (_env.EarthCorePosition - position).normalized;
+            var gravity = directionToTarget * GetGravity(position);
 
             _rb.AddForce(gravity * _rb.mass, ForceMode2D.Force);
 
             // air resistance/linear drag
-            var airDensity = GetAirDensity();
+            var airDensity = GetAirDensity(position);
             var speed = _rb.linearVelocity.magnitude;
             var drag = -_rb.linearVelocity.normalized * (_dragCoefficient * airDensity * speed * speed);
             _rb.AddForce(drag, ForceMode2D.Force);

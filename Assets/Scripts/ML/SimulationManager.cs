@@ -86,9 +86,9 @@ namespace ML
                     ship.Rb.MovePositionAndRotation(_spawnPosition, Quaternion.identity);
                     ship.Reinitialise();
                 }
-                
+
                 Physics2D.SyncTransforms();
-                
+
                 yield return new WaitForSeconds(_generationDuration);
 
                 for (var i = 0; i < _population.Count; i++)
@@ -121,7 +121,7 @@ namespace ML
             // todo detect if in orbit
             // todo detect circularity of orbit
 
-            fitness += ship.PlanetaryPhysics.GetAltitude();
+            fitness += ship.PlanetaryPhysics.GetAltitude(ship.Rb.position);
 
             return Mathf.Max(0f, fitness);
         }

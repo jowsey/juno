@@ -83,7 +83,7 @@ namespace Ship
 
         private float[] GetNormalizedInputs()
         {
-            _inputs[0] = PlanetaryPhysics.GetAtmosphereProgress();
+            _inputs[0] = PlanetaryPhysics.GetAtmosphereProgress(Rb.position);
             _inputs[1] = Rb.linearVelocity.x / 500f;
             _inputs[2] = Rb.linearVelocity.y / 500f;
             _inputs[3] = Mathf.Clamp(Rb.angularVelocity / 360f, -1, 1);
@@ -157,7 +157,7 @@ namespace Ship
             {
                 group = _firstStageGroup;
             }
-            
+
             group?.Separate();
         }
 
