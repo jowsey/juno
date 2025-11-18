@@ -13,8 +13,15 @@ namespace Ship
 
         public float GetAverageFuelRemaining()
         {
-            return Stages.Sum(stage => stage.GetFuelRemaining()) / Stages.Length;
+            var total = 0f;
+            foreach (var stage in Stages)
+            {
+                total += stage.GetFuelRemaining();
+            }
+
+            return total / Stages.Length;
         }
+
 
         public void Separate()
         {
@@ -55,6 +62,8 @@ namespace Ship
         [SerializeField] private StageGroup _boosterStageGroup;
         [SerializeField] private StageGroup _firstStageGroup;
 
+        private float[] _inputs;
+
         private void Awake()
         {
             Rb = GetComponent<Rigidbody2D>();
@@ -62,6 +71,8 @@ namespace Ship
 
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
+
+            _inputs = new float[_networkShape[0]];
         }
 
         private void Start()
@@ -72,19 +83,18 @@ namespace Ship
 
         private float[] GetNormalizedInputs()
         {
-            return new[]
-            {
-                PlanetaryPhysics.GetAtmosphereProgress(),
-                Rb.linearVelocity.x / 500f,
-                Rb.linearVelocity.y / 500f,
-                Mathf.Clamp(Rb.angularVelocity / 360f, -1, 1),
-                NormalizeRotation(Rb.rotation),
-                _topLevelStage.GetFuelRemaining(),
-                _firstStageGroup.GetAverageFuelRemaining(),
-                _boosterStageGroup.GetAverageFuelRemaining(),
-                _firstStageGroup.Separated ? 1f : -1f,
-                _boosterStageGroup.Separated ? 1f : -1f
-            };
+            _inputs[0] = PlanetaryPhysics.GetAtmosphereProgress();
+            _inputs[1] = Rb.linearVelocity.x / 500f;
+            _inputs[2] = Rb.linearVelocity.y / 500f;
+            _inputs[3] = Mathf.Clamp(Rb.angularVelocity / 360f, -1, 1);
+            _inputs[4] = NormalizeRotation(Rb.rotation);
+            _inputs[5] = _topLevelStage.GetFuelRemaining();
+            _inputs[6] = _firstStageGroup.GetAverageFuelRemaining();
+            _inputs[7] = _boosterStageGroup.GetAverageFuelRemaining();
+            _inputs[8] = _firstStageGroup.Separated ? 1f : -1f;
+            _inputs[9] = _boosterStageGroup.Separated ? 1f : -1f;
+
+            return _inputs;
         }
 
         private float NormalizeRotation(float rotation)
@@ -147,7 +157,7 @@ namespace Ship
             {
                 group = _firstStageGroup;
             }
-
+            
             group?.Separate();
         }
 
@@ -155,7 +165,7 @@ namespace Ship
         {
             Rb.linearVelocity = Vector2.zero;
             Rb.angularVelocity = 0f;
-            
+
             gameObject.SetActive(true);
 
             _topLevelStage.Reinitialise();

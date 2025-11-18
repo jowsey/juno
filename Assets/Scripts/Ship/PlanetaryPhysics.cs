@@ -6,9 +6,9 @@ namespace Ship
     public class PlanetaryPhysics : MonoBehaviour
     {
         private const float SurfaceGravity = 9.81f;
+        private static Environment _env;
 
         private Rigidbody2D _rb;
-        private static Environment _env;
 
         [SerializeField] private float _airDensityFalloff = 5f;
         [SerializeField] private float _dragCoefficient = 20f;
@@ -16,36 +16,32 @@ namespace Ship
 
         private void Awake()
         {
+            if (!_env) _env = FindAnyObjectByType<Environment>();
+
             _rb = GetComponent<Rigidbody2D>();
             _rb.gravityScale = 0f;
-            _env ??= FindAnyObjectByType<Environment>();
         }
 
         public float GetAltitude()
         {
-            var planetRadius = _env.EarthCore.lossyScale.x * 0.5f;
             var distanceToCore = Vector2.Distance(transform.position, _env.EarthCore.position);
-
-            var altitude = distanceToCore - planetRadius;
+            var altitude = distanceToCore - _env.EarthCoreRadius;
             return Mathf.Max(0f, altitude);
         }
 
         public float GetAtmosphereProgress()
         {
-            var atmosphereRadius = _env.EarthAtmosphere.lossyScale.x * 0.5f;
-            var planetRadius = _env.EarthCore.lossyScale.x * 0.5f;
             var distanceToCenter = Vector2.Distance(transform.position, _env.EarthCore.position);
-            return Mathf.Clamp01((distanceToCenter - planetRadius) / (atmosphereRadius - planetRadius));
+            return Mathf.Clamp01(
+                (distanceToCenter - _env.EarthCoreRadius) / (_env.EarthAtmosphereRadius - _env.EarthCoreRadius)
+            );
         }
 
         public float GetGravity()
         {
-            var planetRadius = _env.EarthCore.lossyScale.x * 0.5f;
             var distanceToCore = Vector2.Distance(transform.position, _env.EarthCore.position);
-
-            var r = Mathf.Max(distanceToCore, planetRadius);
-
-            return SurfaceGravity * (planetRadius * planetRadius) / (r * r);
+            var r = Mathf.Max(distanceToCore, _env.EarthCoreRadius);
+            return SurfaceGravity * (_env.EarthCoreRadius * _env.EarthCoreRadius) / (r * r);
         }
 
         public float GetAirDensity()

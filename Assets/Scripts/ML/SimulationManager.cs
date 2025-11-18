@@ -88,7 +88,7 @@ namespace ML
                 }
                 
                 Physics2D.SyncTransforms();
-
+                
                 yield return new WaitForSeconds(_generationDuration);
 
                 for (var i = 0; i < _population.Count; i++)

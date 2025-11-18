@@ -24,6 +24,8 @@ namespace Ship
 
         public float StoredZRot;
 
+        private float _currentParticleRatio;
+
         private new void Awake()
         {
             base.Awake();
@@ -36,6 +38,9 @@ namespace Ship
 
         public void SetParticleRatio(float ratio)
         {
+            if (Mathf.Approximately(_currentParticleRatio, ratio)) return;
+            _currentParticleRatio = ratio;
+
             var emission = _flameParticles.emission;
             emission.rateOverTime = _initialParticleRateOverTime * ratio;
         }

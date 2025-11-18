@@ -1,13 +1,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Ship
 {
     public class SpaceshipStage : MonoBehaviour
     {
+        private static GameObject _explosionPrefab;
+
         // owning parent ship
         public SpaceshipController Ship { get; private set; }
+
+        // rigidbody we contribute to, either our parent's or our own when separated
+        public Rigidbody2D Rb { get; private set; }
+
+        // true if we're not connected to any stage above us (i.e. we own our physics)
+        public bool IsRootStage;
 
         private SpaceshipStage _parentStage;
 
@@ -15,18 +24,14 @@ namespace Ship
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
 
-        // rigidbody we contribute to, either our parent's or our own when separated
-        public Rigidbody2D Rb { get; private set; }
-
-        // true if we're not connected to any stage above us (i.e. we own our physics)
-        [HideInInspector] public bool IsRootStage;
-
-        [SerializeField] private GameObject _fairing;
-
-        [SerializeField] private Vector3 _separateDirection;
         private const float RelativeSeparationForce = 2f;
 
+        private const float CrashVelocityThreshold = 5f;
+        private const float AngularVelocityExplodeThreshold = 1800f;
+
         [SerializeField] private bool _fixCenterOfMass = true;
+        [SerializeField] private GameObject _fairing;
+        [SerializeField] private Vector3 _separateDirection;
 
         // parts directly owned by this stage
         private List<BodyPart> _stageParts = new();
@@ -36,10 +41,18 @@ namespace Ship
         // all parts connected to this stage (including child stages)
         private List<BodyPart> _allOwnedParts = new();
 
+        // allows child stages to detach themselves from us
+        private UnityEvent _onExplode = new();
+
         private void Awake()
         {
+            if (!_explosionPrefab) _explosionPrefab = Resources.Load<GameObject>("FX/Explosion");
+
             Ship = GetComponentInParent<SpaceshipController>();
-            _parentStage = transform.parent?.GetComponentInParent<SpaceshipStage>();
+            if (transform.parent) _parentStage = transform.parent.GetComponentInParent<SpaceshipStage>();
+
+            // detach from parent when it explodes
+            if (_parentStage) _parentStage._onExplode.AddListener(OnParentExplode);
 
             Rb = Ship.Rb;
 
@@ -50,6 +63,20 @@ namespace Ship
             RescanParts();
         }
 
+        private void Start()
+        {
+            if (IsRootStage && _fixCenterOfMass && Rb.centerOfMass.x != 0f)
+            {
+                FixCenterOfMass();
+            }
+        }
+
+        private void OnParentExplode()
+        {
+            // explode only if we're connected, don't tell parent again
+            if (!IsRootStage) Explode(false);
+        }
+
         public void RescanParts()
         {
             _stageParts.Clear();
@@ -58,16 +85,17 @@ namespace Ship
 
             foreach (Transform child in transform)
             {
-                if (child.TryGetComponent<BodyPart>(out var part))
-                {
-                    _stageParts.Add(part);
-                    if (part is Engine engine) _engines.Add(engine);
-                    if (part is FuelTank tank) _fuelTanks.Add(tank);
-                }
+                if (!child.TryGetComponent<BodyPart>(out var part)) continue;
+                _stageParts.Add(part);
+
+                if (part is Engine engine) _engines.Add(engine);
+                if (part is FuelTank tank) _fuelTanks.Add(tank);
             }
 
             GetComponentsInChildren<BodyPart>(_allOwnedParts);
             CheckForDestruction();
+
+            RecalculateLinkedMass();
         }
 
         public void CheckForDestruction()
@@ -97,11 +125,6 @@ namespace Ship
             }
 
             Rb.mass = totalMass;
-
-            if (_fixCenterOfMass && Rb.centerOfMass.x != 0f)
-            {
-                FixCenterOfMass();
-            }
         }
 
         private void FixCenterOfMass()
@@ -147,20 +170,31 @@ namespace Ship
             }
         }
 
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.relativeVelocity.magnitude < CrashVelocityThreshold) return;
+            if (!isActiveAndEnabled) return; // todo check if needed
+
+            Explode();
+        }
+
         private void FixedUpdate()
         {
+            // explode if rotating too fast (ripped apart by force)
+            if (Mathf.Abs(Rb.angularVelocity) >= AngularVelocityExplodeThreshold)
+            {
+                Explode();
+                return;
+            }
+
             // recalculate mass if root stage
-            if (IsRootStage) RecalculateLinkedMass();
+            // if (IsRootStage) RecalculateLinkedMass();
 
             var linkedFuelAvailable = 0f;
-            foreach (var part in _stageParts)
+            foreach (var tank in _fuelTanks)
             {
-                if (!part.isActiveAndEnabled) continue;
-
-                if (part is FuelTank tank)
-                {
-                    linkedFuelAvailable += tank.StoredFuelKg;
-                }
+                if (!tank.isActiveAndEnabled) continue;
+                linkedFuelAvailable += tank.StoredFuelKg;
             }
 
             var totalFuelUsage = 0f;
@@ -170,6 +204,8 @@ namespace Ship
             {
                 if (!engine.isActiveAndEnabled) continue;
 
+                var engineTransform = engine.transform;
+
                 // handle steering rotation
                 var rotationChange = engine.SteeringControl * engine.RotationSpeed * Time.fixedDeltaTime;
                 engine.StoredZRot = Mathf.Clamp(
@@ -177,11 +213,7 @@ namespace Ship
                     -engine.MaxRotation,
                     engine.MaxRotation
                 );
-                engine.transform.localEulerAngles = new Vector3(
-                    engine.transform.localEulerAngles.x,
-                    engine.transform.localEulerAngles.y,
-                    engine.StoredZRot
-                );
+                engineTransform.localRotation = Quaternion.Euler(0f, 0f, engine.StoredZRot);
 
                 if (linkedFuelAvailable <= 0f || engine.ThrustControl <= 0f)
                 {
@@ -197,8 +229,8 @@ namespace Ship
                 engine.SetParticleRatio(cappedThrust);
 
                 Rb.AddForceAtPosition(
-                    engine.transform.up * (cappedThrust * engine.MaxThrust),
-                    engine.transform.position
+                    engineTransform.up * (cappedThrust * engine.MaxThrust),
+                    engineTransform.position
                 );
 
                 linkedFuelAvailable -= cappedFuelUsage;
@@ -206,15 +238,17 @@ namespace Ship
             }
 
             // consume fuel from tanks
-            foreach (var part in _stageParts)
+            foreach (var tank in _fuelTanks)
             {
-                if (!part.isActiveAndEnabled || part is not FuelTank tank) continue;
+                if (!tank.isActiveAndEnabled) continue;
 
                 var fuelToConsume = Mathf.Min(tank.StoredFuelKg, totalFuelUsage);
                 tank.StoredFuelKg -= fuelToConsume;
                 totalFuelUsage -= fuelToConsume;
                 if (totalFuelUsage <= 0f) break;
             }
+            
+            Rb.mass -= totalFuelUsage;
         }
 
         public void Separate()
@@ -231,6 +265,8 @@ namespace Ship
                     child.gameObject.SetActive(false);
                 }
             }
+
+            SetThrustControl(0f);
 
             var inheritedLinearVelocity = Rb.linearVelocity;
             var inheritedAngularVelocity = Rb.angularVelocity;
@@ -250,6 +286,11 @@ namespace Ship
 
             RecalculateLinkedMass();
 
+            if (_fixCenterOfMass && Rb.centerOfMass.x != 0f)
+            {
+                FixCenterOfMass();
+            }
+
             gameObject.AddComponent<PlanetaryPhysics>();
 
             // apply separation force
@@ -262,6 +303,26 @@ namespace Ship
             Gizmos.color = Color.yellow;
             var worldDir = transform.TransformDirection(_separateDirection.normalized);
             Gizmos.DrawLine(transform.position, transform.position + worldDir);
+        }
+
+        public void Explode(bool tellParent = true)
+        {
+            foreach (var part in _stageParts)
+            {
+                var fx = Instantiate(_explosionPrefab, part.transform.position, Quaternion.identity);
+                fx.transform.parent = Ship.transform.parent;
+            }
+
+            // propagate downwards
+            _onExplode.Invoke();
+
+            // propagate upwards
+            if (tellParent && _parentStage && !IsRootStage)
+            {
+                _parentStage.Explode();
+            }
+
+            gameObject.SetActive(false);
         }
 
         public void Reinitialise()

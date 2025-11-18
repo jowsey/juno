@@ -809,8 +809,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8384245af53e4d008729404503788364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Environment
-  EarthCore: {fileID: 2091774202}
-  EarthAtmosphere: {fileID: 432811301}
+  <EarthCore>k__BackingField: {fileID: 2091774202}
+  <EarthAtmosphere>k__BackingField: {fileID: 432811301}
+  <EarthCoreRadius>k__BackingField: 0
+  <EarthAtmosphereRadius>k__BackingField: 0
 --- !u!1 &1321753765
 GameObject:
   m_ObjectHideFlags: 0
@@ -855,10 +857,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbff2cc13dcb4be18fb4128195cc1577, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ML.SimulationManager
-  _maxGenerations: 100
+  _maxGenerations: 200
   _populationSize: 100
-  _trainingTimeScale: 1
-  _generationDuration: 60
+  _trainingTimeScale: 5
+  _generationDuration: 120
   _eliteCount: 5
   _mutationRate: 0.05
   _mutationStrength: 0.5

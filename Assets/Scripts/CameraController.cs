@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour
 
     private void OnValidate()
     {
-        _camera ??= GetComponent<Camera>();
+        if (!_camera) _camera = GetComponent<Camera>();
     }
 
     private void Start()
