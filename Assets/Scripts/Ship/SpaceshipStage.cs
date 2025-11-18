@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -229,6 +228,8 @@ namespace Ship
                 totalFuelUsage += cappedFuelUsage;
             }
 
+            Rb.mass -= totalFuelUsage;
+
             // consume fuel from tanks
             for (var i = 0; i < _fuelTanks.Count; i++)
             {
@@ -239,8 +240,6 @@ namespace Ship
                 totalFuelUsage -= fuelToConsume;
                 if (totalFuelUsage <= 0f) break;
             }
-
-            Rb.mass -= totalFuelUsage;
         }
 
         public void Separate()
