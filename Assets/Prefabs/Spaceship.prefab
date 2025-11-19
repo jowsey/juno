@@ -502,6 +502,7 @@ MonoBehaviour:
     Stages:
     - {fileID: 343122713911733459}
     Separated: 0
+  HighestAtmosphereProgress: 0
 --- !u!114 &710132882649918085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,7 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Ship.PlanetaryPhysics
   _airDensityFalloff: 5
   _dragCoefficient: 20
-  _angularDamping: 4
+  _angularDamping: 1
 --- !u!210 &1083237447916173707
 SortingGroup:
   m_ObjectHideFlags: 0

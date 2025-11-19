@@ -35,10 +35,6 @@ namespace ML
         [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
         [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.1f;
 
-        [Header("Fitness")] [SerializeField] private float _periapsisWeight = 1f;
-        [SerializeField] private float _eccentricityWeight = 3f;
-        [SerializeField] private float _stableOrbitBonus = 10f;
-
         [Header("Ship")] [SerializeField] private SpaceshipController _spaceshipPrefab;
         [SerializeField] private Vector3 _spawnPosition;
         [SerializeField] private Transform _shipContainer;
@@ -50,6 +46,10 @@ namespace ML
         [SerializeField] private TMP_InputField _speedInput;
         [SerializeField] private Button _copyStateButton;
         [SerializeField] private Button _pasteStateButton;
+        [SerializeField] private Button _viewBestButton;
+        [SerializeField] private TextMeshProUGUI _viewBestButtonText;
+
+        private CameraController _cameraController;
 
         private float _generationStartTime;
 
@@ -60,12 +60,15 @@ namespace ML
         {
             Instance = this;
 
+            _cameraController = FindAnyObjectByType<CameraController>();
+
             _population = new List<SpaceshipController>(_populationSize);
             _fitnessScores = new List<float>(_populationSize);
 
             _speedInput.onValueChanged.AddListener(OnSpeedValueChanged);
             _copyStateButton.onClick.AddListener(OnCopyStateClicked);
             _pasteStateButton.onClick.AddListener(OnPasteStateClicked);
+            _viewBestButton.onClick.AddListener(OnViewBestClicked);
         }
 
         private void Start()
@@ -143,10 +146,6 @@ namespace ML
                 _eliteCount.ToString(),
                 _mutationRate.ToString("F6", CultureInfo.InvariantCulture),
                 _mutationStrength.ToString("F6", CultureInfo.InvariantCulture),
-                // rewards
-                _periapsisWeight.ToString("F6", CultureInfo.InvariantCulture),
-                _eccentricityWeight.ToString("F6", CultureInfo.InvariantCulture),
-                _stableOrbitBonus.ToString("F6", CultureInfo.InvariantCulture),
             };
 
             foreach (var ship in _population)
@@ -170,7 +169,12 @@ namespace ML
                 var fullState = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
                 var stateLines = fullState.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                const int numParameters = 9;
+                const int numParameters = 6;
+
+                if (stateLines.Length != numParameters + _population.Count)
+                {
+                    throw new Exception("Invalid state data: incorrect number of lines. (probably different population size)");
+                }
 
                 _currentGeneration = int.Parse(stateLines[0]);
                 _maxGenerations = int.Parse(stateLines[1]);
@@ -178,15 +182,6 @@ namespace ML
                 _eliteCount = int.Parse(stateLines[3]);
                 _mutationRate = float.Parse(stateLines[4], CultureInfo.InvariantCulture);
                 _mutationStrength = float.Parse(stateLines[5], CultureInfo.InvariantCulture);
-                // rewards
-                _periapsisWeight = float.Parse(stateLines[6], CultureInfo.InvariantCulture);
-                _eccentricityWeight = float.Parse(stateLines[7], CultureInfo.InvariantCulture);
-                _stableOrbitBonus = float.Parse(stateLines[8], CultureInfo.InvariantCulture);
-
-                if (_populationSize != _population.Count)
-                {
-                    throw new Exception($"Population size mismatch. (Expected {_population.Count}, got {_populationSize})");
-                }
 
                 for (var i = 0; i < _population.Count; i++)
                 {
@@ -196,7 +191,7 @@ namespace ML
                     _fitnessScores[i] = 0f;
                 }
 
-                Debug.Log("<color=cyan>Loaded state from clipboard.</color>");
+                Debug.Log("<color=green>Loaded state from clipboard.</color>");
 
                 StopCoroutine(TrainingLoop());
                 StartCoroutine(TrainingLoop());
@@ -205,6 +200,28 @@ namespace ML
             {
                 Debug.LogError("<color=red>Failed to load state from clipboard: " + e.Message + "</color>");
             }
+        }
+
+        private void OnViewBestClicked()
+        {
+            if (_cameraController.FollowTarget)
+            {
+                _cameraController.FollowTarget = null;
+                _viewBestButtonText.text = "View best";
+                Debug.Log("Stopped following best ship.");
+                return;
+            }
+
+            var bestIndex = _fitnessScores
+                .Select((fitness, index) => new { fitness, index })
+                .OrderByDescending(x => x.fitness)
+                .First().index;
+
+            var bestShip = _population[bestIndex];
+
+            _cameraController.FollowTarget = bestShip.transform;
+            _viewBestButtonText.text = "Stop viewing";
+            Debug.Log($"Following best ship with fitness of {_fitnessScores[bestIndex]:F3}).");
         }
 
         private void UpdateFitnessUI(float prevAverage = 0f, float prevMax = 0f)
@@ -266,34 +283,33 @@ namespace ML
 
         private float EvaluateFitness(SpaceshipController ship)
         {
-            // crashed, failed
-            if (!ship.isActiveAndEnabled) return -1f;
-
             var fitness = 0f;
 
             var position = ship.Rb.position;
             var velocity = ship.Rb.linearVelocity;
 
-            var distanceFromLaunch = Vector2.Distance(position, _spawnPosition);
-            fitness += distanceFromLaunch * 0.0001f; // small reward for getting a move on
-
             var orbit = OrbitDescription.Calculate(position, velocity);
 
+            var planetRadius = Environment.Instance.PlanetRadius;
             var atmosphereRadius = Environment.Instance.AtmosphereRadius;
-            var minOrbitAltitude = atmosphereRadius + 500f;
+
+            var goalOrbitAltitude = atmosphereRadius + 500f;
+            // var apoapsisProgress = (orbit.Apoapsis - planetRadius) / (goalOrbitAltitude - planetRadius);
+            var periapsisProgress = orbit.Periapsis / goalOrbitAltitude;
+
+            fitness += ship.HighestAtmosphereProgress * 0.01f; // 0 - 0.01 to nudge off ground
 
             // reward for higher periapsis
-            fitness += (orbit.Periapsis / minOrbitAltitude) * _periapsisWeight;
+            fitness += periapsisProgress;
 
             // bonus for more circular orbits
-            fitness += Mathf.Clamp01(1f - orbit.Eccentricity) * _eccentricityWeight;
+            fitness += Mathf.Clamp01(1f - orbit.Eccentricity) * 2f;
 
             // immediately reward any kind of stable orbit
             if (orbit.IsStable)
             {
-                fitness += _stableOrbitBonus;
+                fitness += 5f;
             }
-
 
             return fitness;
         }

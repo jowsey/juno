@@ -4,11 +4,12 @@ using UnityEngine.InputSystem;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
-    [SerializeField] private Transform _followTarget;
     [SerializeField] private Vector3 _localFollowOffset;
-    [SerializeField] private float _zoomRelativeMoveSpeed = 1f;
-    [SerializeField] private float _minZoom = 2;
-    [SerializeField] private float _maxZoom = 100;
+    [SerializeField] private float _zoomRelativeMoveSpeed = 2f;
+    [SerializeField] private float _minZoom = 5;
+    [SerializeField] private float _maxZoom = 2000;
+
+    public Transform FollowTarget;
 
     private InputAction _moveAction;
     private InputAction _zoomAction;
@@ -26,13 +27,13 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_followTarget)
+        if (FollowTarget)
         {
             _camera.transform.position = new Vector3(
-                _followTarget.position.x,
-                _followTarget.position.y,
+                FollowTarget.position.x,
+                FollowTarget.position.y,
                 _camera.transform.position.z
-            ) + _followTarget.TransformVector(_localFollowOffset);
+            ) + FollowTarget.TransformVector(_localFollowOffset);
         }
         else
         {
@@ -43,6 +44,8 @@ public class CameraController : MonoBehaviour
         }
 
         var zoom = _zoomAction.ReadValue<float>();
+        var logMultiplier = Mathf.Log(_camera.orthographicSize, 2f);
+        zoom *= logMultiplier;
         _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize - zoom, _minZoom, _maxZoom);
     }
 }
