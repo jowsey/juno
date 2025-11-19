@@ -11,21 +11,21 @@ namespace ML
 {
     public class SimulationManager : MonoBehaviour
     {
+        private int _currentGeneration = 1;
+
         [Header("Generation parameters")] [SerializeField]
         private int _maxGenerations = 100;
 
         [SerializeField] private int _populationSize = 100;
-        [SerializeField] private float _generationDuration = 60f;
+        [SerializeField] private float _generationDuration = 90f;
 
-        [SerializeField] private int _eliteCount = 10;
-        [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.05f;
-        [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.5f;
+        [SerializeField] private int _eliteCount = 5;
+        [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
+        [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.1f;
 
         [Header("Ship")] [SerializeField] private SpaceshipController _spaceshipPrefab;
         [SerializeField] private Vector3 _spawnPosition;
         [SerializeField] private Transform _shipContainer;
-
-        [Header("State")] public int CurrentGeneration = 1;
 
         [Header("UI")] [SerializeField] private TextMeshProUGUI _timerText;
         [SerializeField] private TextMeshProUGUI _generationText;
@@ -69,7 +69,7 @@ namespace ML
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
 
             var maxNumDigits = _maxGenerations.ToString().Length;
-            var currentGenStr = CurrentGeneration.ToString().PadLeft(maxNumDigits, '0');
+            var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
             _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
         }
 
@@ -86,9 +86,9 @@ namespace ML
             // we do everything through physics, so disable auto-sync
             Physics2D.autoSyncTransforms = false;
 
-            while (CurrentGeneration <= _maxGenerations)
+            while (_currentGeneration <= _maxGenerations)
             {
-                Debug.Log($"<color=green>Running generation <b>{CurrentGeneration}</b></color>");
+                Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
                 _generationStartTime = Time.time;
 
                 foreach (var ship in _population)
@@ -113,7 +113,7 @@ namespace ML
                 Debug.Log($"Avg. <color=cyan>{avgFitness:F2}</color>, max. <color=yellow>{maxFitness:F2}</color>");
 
                 EvolvePopulation();
-                CurrentGeneration++;
+                _currentGeneration++;
             }
         }
 
@@ -155,14 +155,14 @@ namespace ML
             {
                 var parent1 = TournamentSelect(5);
                 var parent2 = TournamentSelect(5);
-                var childBrain = NeuralNetwork.FromParents(parent1, parent2);
+                var childBrain = new NeuralNetwork(parent1, parent2);
 
                 var weights = childBrain.GetFlatWeights();
                 for (var i = 0; i < weights.Length; i++)
                 {
                     if (Random.value < _mutationRate)
                     {
-                        weights[i] += Random.Range(-_mutationStrength, _mutationStrength);
+                        weights[i] += (Random.value - Random.value) * _mutationStrength;
                     }
                 }
 

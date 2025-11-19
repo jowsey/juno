@@ -28,14 +28,11 @@ namespace ML
             _layers = other._layers.Clone() as int[];
 
             InitNeurons();
+            InitWeights(false);
 
             // deep copy weights and biases
-            _weights = new float[other._weights.Length][][];
-            _biases = new float[other._biases.Length][];
-
             for (var i = 0; i < other._weights.Length; i++)
             {
-                _weights[i] = new float[other._weights[i].Length][];
                 for (var j = 0; j < other._weights[i].Length; j++)
                 {
                     _weights[i][j] = other._weights[i][j].Clone() as float[];
@@ -46,6 +43,27 @@ namespace ML
             {
                 _biases[i] = other._biases[i].Clone() as float[];
             }
+        }
+
+        // crossover between two parents to create a child
+        public NeuralNetwork(NeuralNetwork parent1, NeuralNetwork parent2)
+        {
+            _layers = parent1._layers.Clone() as int[];
+
+            InitNeurons();
+            InitWeights(false);
+
+            var parent1Genes = parent1.GetFlatWeights();
+            var parent2Genes = parent2.GetFlatWeights();
+
+            var childGenes = new float[parent1Genes.Length];
+
+            for (var i = 0; i < parent1Genes.Length; i++)
+            {
+                childGenes[i] = Random.value > 0.5f ? parent1Genes[i] : parent2Genes[i];
+            }
+
+            SetFlatWeights(childGenes);
         }
 
         // new empty neurons
@@ -59,7 +77,7 @@ namespace ML
         }
 
         // random weights and zero biases
-        private void InitWeights()
+        private void InitWeights(bool randomize = true)
         {
             _weights = new float[_layers.Length - 1][][];
             _biases = new float[_layers.Length - 1][];
@@ -72,37 +90,23 @@ namespace ML
                 _weights[i] = new float[neuronsInLayer][];
                 _biases[i] = new float[neuronsInLayer];
 
-                var scale = Mathf.Sqrt(2f / (neuronsInPrevLayer + neuronsInLayer));
+                var scale = randomize ? Mathf.Sqrt(2f / (neuronsInPrevLayer + neuronsInLayer)) : 0f;
 
                 for (var j = 0; j < neuronsInLayer; j++)
                 {
                     _weights[i][j] = new float[neuronsInPrevLayer];
-                    for (var k = 0; k < neuronsInPrevLayer; k++)
+
+                    if (randomize)
                     {
-                        _weights[i][j][k] = Random.Range(-1f, 1f) * scale;
+                        for (var k = 0; k < neuronsInPrevLayer; k++)
+                        {
+                            _weights[i][j][k] = Random.Range(-1f, 1f) * scale;
+                        }
                     }
 
                     _biases[i][j] = 0f;
                 }
             }
-        }
-
-        public static NeuralNetwork FromParents(NeuralNetwork parent1, NeuralNetwork parent2)
-        {
-            var parent1Genes = parent1.GetFlatWeights();
-            var parent2Genes = parent2.GetFlatWeights();
-
-            var childGenes = new float[parent1Genes.Length];
-
-            var crossoverPoint = Random.Range(0, parent1Genes.Length);
-            for (var i = 0; i < parent1Genes.Length; i++)
-            {
-                childGenes[i] = i < crossoverPoint ? parent1Genes[i] : parent2Genes[i];
-            }
-
-            var child = new NeuralNetwork(parent1._layers);
-            child.SetFlatWeights(childGenes);
-            return child;
         }
 
         // feed input through the network

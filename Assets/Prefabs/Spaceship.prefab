@@ -490,7 +490,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Spaceship
   _useBrain: 1
   PlanetaryPhysics: {fileID: 0}
-  _hiddenLayers: 0c000000
+  _hiddenLayers: 0e000000
   _boosterStageGroup:
     Stages:
     - {fileID: 8509284842110399341}

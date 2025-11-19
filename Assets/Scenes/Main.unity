@@ -1333,13 +1333,12 @@ MonoBehaviour:
   _maxGenerations: 100
   _populationSize: 100
   _generationDuration: 90
-  _eliteCount: 10
-  _mutationRate: 0.1
-  _mutationStrength: 0.5
+  _eliteCount: 5
+  _mutationRate: 0.02
+  _mutationStrength: 0.1
   _spaceshipPrefab: {fileID: 7247496989856108138, guid: e086e47e1897443f298d2392860d479a, type: 3}
   _spawnPosition: {x: 0, y: 12.1, z: 0}
   _shipContainer: {fileID: 1911069517}
-  CurrentGeneration: 1
   _timerText: {fileID: 1452712751}
   _generationText: {fileID: 493725520}
   _speedInput: {fileID: 1259137383}
