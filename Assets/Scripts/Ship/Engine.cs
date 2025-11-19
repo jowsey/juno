@@ -1,3 +1,5 @@
+using System;
+using ML;
 using UnityEngine;
 
 namespace Ship
@@ -36,11 +38,32 @@ namespace Ship
             emission.rateOverTime = 0f;
         }
 
-        public void SetParticleRatio(float ratio)
+        private void LateUpdate()
         {
+            switch (SimulationManager.Instance.SpeedTrainingMode)
+            {
+                case true when _flameParticles.gameObject.activeSelf:
+                    SetParticleRatio(0f);
+                    _flameParticles.gameObject.SetActive(false);
+                    break;
+                case false when !_flameParticles.gameObject.activeSelf:
+                    _flameParticles.gameObject.SetActive(true);
+                    SetParticleRatio(_cachedParticleRatio, true);
+                    break;
+            }
+        }
+
+        public void SetParticleRatio(float ratio, bool forceUpdate = false)
+        {
+            if (!_flameParticles.gameObject.activeSelf)
+            {
+                _cachedParticleRatio = ratio;
+                return;
+            }
+
             // if the change is negligible, skip updating
             // always change if going from non-zero to zero
-            if (Mathf.Abs(ratio - _cachedParticleRatio) < 0.01f && !(ratio == 0f && _cachedParticleRatio != 0f)) return;
+            if (!forceUpdate && Mathf.Abs(ratio - _cachedParticleRatio) < 0.01f && !(ratio == 0f && _cachedParticleRatio != 0f)) return;
             _cachedParticleRatio = ratio;
 
             var emission = _flameParticles.emission;

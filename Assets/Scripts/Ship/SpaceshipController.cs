@@ -54,9 +54,6 @@ namespace Ship
 
         [HideInInspector] public PlanetaryPhysics PlanetaryPhysics;
 
-        private const int InputCount = 10;
-        private const int OutputCount = 4;
-        
         public NeuralNetwork Brain;
 
         private SpaceshipStage _topLevelStage;
@@ -64,6 +61,8 @@ namespace Ship
         [SerializeField] private StageGroup _heavyStageGroup;
 
         private float[] _inputs;
+
+        [HideInInspector] public float HighestAtmosphereProgress;
 
         private void Awake()
         {
@@ -73,26 +72,10 @@ namespace Ship
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
-            _inputs = new float[InputCount];
+            _inputs = new float[SimulationManager.InputCount];
         }
 
-        private float[] GetNormalizedInputs()
-        {
-            _inputs[0] = PlanetaryPhysics.GetAtmosphereProgress(Rb.position);
-            _inputs[1] = Rb.linearVelocity.x / 500f;
-            _inputs[2] = Rb.linearVelocity.y / 500f;
-            _inputs[3] = Mathf.Clamp(Rb.angularVelocity / 360f, -1, 1);
-            _inputs[4] = NormalizeRotation(Rb.rotation);
-            _inputs[5] = _topLevelStage.GetFuelRemaining();
-            _inputs[6] = _heavyStageGroup.GetAverageFuelRemaining();
-            _inputs[7] = _boosterStageGroup.GetAverageFuelRemaining();
-            _inputs[8] = _heavyStageGroup.Separated ? 1f : -1f;
-            _inputs[9] = _boosterStageGroup.Separated ? 1f : -1f;
-
-            return _inputs;
-        }
-
-        private float NormalizeRotation(float rotation)
+        private static float NormalizeRotation(float rotation)
         {
             rotation %= 360f;
             if (rotation > 180f) rotation -= 360f;
@@ -103,8 +86,24 @@ namespace Ship
         {
             if (Brain == null || !_useBrain) return;
 
-            var inputs = GetNormalizedInputs();
-            var outputs = Brain.FeedForward(inputs);
+            var atmosphereProgress = PlanetaryPhysics.GetAtmosphereProgress(Rb.position);
+            if (atmosphereProgress > HighestAtmosphereProgress)
+            {
+                HighestAtmosphereProgress = atmosphereProgress;
+            }
+
+            _inputs[0] = atmosphereProgress;
+            _inputs[1] = Rb.linearVelocity.x / 1000f;
+            _inputs[2] = Rb.linearVelocity.y / 1000f;
+            _inputs[3] = Mathf.Clamp(Rb.angularVelocity / SpaceshipStage.AngularVelocityExplodeThreshold, -1, 1);
+            _inputs[4] = NormalizeRotation(Rb.rotation);
+            _inputs[5] = _topLevelStage.GetFuelRemaining();
+            _inputs[6] = _heavyStageGroup.Separated ? 0f : _heavyStageGroup.GetAverageFuelRemaining();
+            _inputs[7] = _boosterStageGroup.Separated ? 0f : _boosterStageGroup.GetAverageFuelRemaining();
+            _inputs[8] = _heavyStageGroup.Separated ? 1f : -1f;
+            _inputs[9] = _boosterStageGroup.Separated ? 1f : -1f;
+
+            var outputs = Brain.FeedForward(_inputs);
 
             var thrustControl = Mathf.Clamp01(outputs[0] * 0.5f + 0.5f);
             var steeringControl = Mathf.Clamp(outputs[1], -1f, 1f);
@@ -158,6 +157,8 @@ namespace Ship
 
         public void Reinitialise()
         {
+            HighestAtmosphereProgress = 0f;
+
             Rb.linearVelocity = Vector2.zero;
             Rb.angularVelocity = 0f;
 

@@ -1,20 +1,27 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Ship;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace ML
 {
     public class SimulationManager : MonoBehaviour
     {
-        private int _currentGeneration = 1;
+        public static SimulationManager Instance { get; private set; }
 
-        private const int InputCount = 10;
-        private const int OutputCount = 4;
+        public bool SpeedTrainingMode;
+
+        private int _currentGeneration;
+
+        public const int InputCount = 10;
+        public const int OutputCount = 4;
 
         [Header("Generation parameters")] [SerializeField]
         private int[] _hiddenLayers = { 12 };
@@ -33,8 +40,16 @@ namespace ML
         [SerializeField] private Transform _shipContainer;
 
         [Header("UI")] [SerializeField] private TextMeshProUGUI _timerText;
+        [SerializeField] private Image _timerProgressBar;
         [SerializeField] private TextMeshProUGUI _generationText;
+        [SerializeField] private TextMeshProUGUI _fitnessText;
         [SerializeField] private TMP_InputField _speedInput;
+        [SerializeField] private Button _copyStateButton;
+        [SerializeField] private Button _pasteStateButton;
+        [SerializeField] private Button _viewBestButton;
+        [SerializeField] private TextMeshProUGUI _viewBestButtonText;
+
+        private CameraController _cameraController;
 
         private float _generationStartTime;
 
@@ -43,10 +58,17 @@ namespace ML
 
         private void Awake()
         {
+            Instance = this;
+
+            _cameraController = FindAnyObjectByType<CameraController>();
+
             _population = new List<SpaceshipController>(_populationSize);
             _fitnessScores = new List<float>(_populationSize);
 
             _speedInput.onValueChanged.AddListener(OnSpeedValueChanged);
+            _copyStateButton.onClick.AddListener(OnCopyStateClicked);
+            _pasteStateButton.onClick.AddListener(OnPasteStateClicked);
+            _viewBestButton.onClick.AddListener(OnViewBestClicked);
         }
 
         private void Start()
@@ -69,11 +91,21 @@ namespace ML
                 _fitnessScores.Add(0f);
             }
 
+            UpdateFitnessUI(); // set initial text
+
             StartCoroutine(TrainingLoop());
         }
 
         private void LateUpdate()
         {
+            if (Keyboard.current.digit1Key.wasPressedThisFrame) Time.timeScale = 1f;
+            if (Keyboard.current.digit2Key.wasPressedThisFrame) Time.timeScale = 5f;
+            if (Keyboard.current.digit3Key.wasPressedThisFrame) Time.timeScale = 10f;
+            if (Keyboard.current.digit4Key.wasPressedThisFrame) Time.timeScale = 60f;
+            if (Keyboard.current.digit5Key.wasPressedThisFrame) Time.timeScale = 100f;
+
+            SpeedTrainingMode = Time.timeScale >= 60f;
+
             if (!_speedInput.isFocused)
             {
                 _speedInput.text = Time.timeScale.ToString("N0");
@@ -82,9 +114,17 @@ namespace ML
             var timespan = TimeSpan.FromSeconds(Time.time - _generationStartTime);
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
 
-            var maxNumDigits = _maxGenerations.ToString().Length;
-            var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
-            _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
+            var progress = Mathf.Clamp01((Time.time - _generationStartTime) / _generationDuration);
+            if (_currentGeneration % 2 == 0)
+            {
+                _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Right;
+                _timerProgressBar.fillAmount = 1f - progress;
+            }
+            else
+            {
+                _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Left;
+                _timerProgressBar.fillAmount = progress;
+            }
         }
 
         private void OnSpeedValueChanged(string input)
@@ -95,15 +135,125 @@ namespace ML
             }
         }
 
+        private void OnCopyStateClicked()
+        {
+            // copy all parameters and weights to clipboard
+            var stateStrings = new List<string>
+            {
+                _currentGeneration.ToString(),
+                _maxGenerations.ToString(),
+                _populationSize.ToString(),
+                _eliteCount.ToString(),
+                _mutationRate.ToString("F6", CultureInfo.InvariantCulture),
+                _mutationStrength.ToString("F6", CultureInfo.InvariantCulture),
+            };
+
+            foreach (var ship in _population)
+            {
+                var weights = ship.Brain.GetFlatWeights();
+                var weightStrings = weights.Select(w => w.ToString("F6", CultureInfo.InvariantCulture));
+                stateStrings.Add(string.Join(",", weightStrings));
+            }
+
+            var fullState = string.Join("\n", stateStrings);
+            var encodedState = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fullState));
+            GUIUtility.systemCopyBuffer = encodedState;
+            Debug.Log("<color=cyan>Copied state to clipboard.</color>");
+        }
+
+        private void OnPasteStateClicked()
+        {
+            try
+            {
+                var encodedState = GUIUtility.systemCopyBuffer;
+                var fullState = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
+                var stateLines = fullState.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                const int numParameters = 6;
+
+                if (stateLines.Length != numParameters + _population.Count)
+                {
+                    throw new Exception("Invalid state data: incorrect number of lines. (probably different population size)");
+                }
+
+                _currentGeneration = int.Parse(stateLines[0]);
+                _maxGenerations = int.Parse(stateLines[1]);
+                _populationSize = int.Parse(stateLines[2]);
+                _eliteCount = int.Parse(stateLines[3]);
+                _mutationRate = float.Parse(stateLines[4], CultureInfo.InvariantCulture);
+                _mutationStrength = float.Parse(stateLines[5], CultureInfo.InvariantCulture);
+
+                for (var i = 0; i < _population.Count; i++)
+                {
+                    var weightStrings = stateLines[numParameters + i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var weights = weightStrings.Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                    _population[i].Brain.SetFlatWeights(weights);
+                    _fitnessScores[i] = 0f;
+                }
+
+                Debug.Log("<color=green>Loaded state from clipboard.</color>");
+
+                StopCoroutine(TrainingLoop());
+                StartCoroutine(TrainingLoop());
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("<color=red>Failed to load state from clipboard: " + e.Message + "</color>");
+            }
+        }
+
+        private void OnViewBestClicked()
+        {
+            if (_cameraController.FollowTarget)
+            {
+                _cameraController.FollowTarget = null;
+                _viewBestButtonText.text = "View best";
+                Debug.Log("Stopped following best ship.");
+                return;
+            }
+
+            var bestIndex = _fitnessScores
+                .Select((fitness, index) => new { fitness, index })
+                .OrderByDescending(x => x.fitness)
+                .First().index;
+
+            var bestShip = _population[bestIndex];
+
+            _cameraController.FollowTarget = bestShip.transform;
+            _viewBestButtonText.text = "Stop viewing";
+            Debug.Log($"Following best ship with fitness of {_fitnessScores[bestIndex]:F3}).");
+        }
+
+        private void UpdateFitnessUI(float prevAverage = 0f, float prevMax = 0f)
+        {
+            var avgFitness = _fitnessScores.Average();
+            var maxFitness = _fitnessScores.Max();
+
+            var avgDiff = avgFitness - prevAverage;
+            var maxDiff = maxFitness - prevMax;
+            var avgDiffFmt = avgDiff >= 0 ? $"+{avgDiff:F3}" : $"{avgDiff:F3}";
+            var maxDiffFmt = maxDiff >= 0 ? $"+{maxDiff:F3}" : $"{maxDiff:F3}";
+
+            var fmt =
+                $"avg. <color=yellow>{avgFitness:F3}</color> ({avgDiffFmt}), " +
+                $"max. <color=green>{maxFitness:F3}</color> ({maxDiffFmt})";
+
+            _fitnessText.text = fmt;
+            Debug.Log(fmt);
+        }
+
         private IEnumerator TrainingLoop()
         {
-            // we do everything through physics, so disable auto-sync
-            Physics2D.autoSyncTransforms = false;
-
-            while (_currentGeneration <= _maxGenerations)
+            while (_currentGeneration < _maxGenerations)
             {
+                _currentGeneration++;
+
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
                 _generationStartTime = Time.time;
+
+                var maxNumDigits = _maxGenerations.ToString().Length;
+                var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
+                _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
 
                 foreach (var ship in _population)
                 {
@@ -115,6 +265,9 @@ namespace ML
 
                 yield return new WaitForSeconds(_generationDuration);
 
+                var prevAverage = _fitnessScores.Average();
+                var prevMax = _fitnessScores.Max();
+
                 for (var i = 0; i < _population.Count; i++)
                 {
                     var ship = _population[i];
@@ -122,12 +275,9 @@ namespace ML
                     _fitnessScores[i] = fitness;
                 }
 
-                var maxFitness = _fitnessScores.Max();
-                var avgFitness = _fitnessScores.Average();
-                Debug.Log($"Avg. <color=cyan>{avgFitness:F2}</color>, max. <color=yellow>{maxFitness:F2}</color>");
+                UpdateFitnessUI(prevAverage, prevMax);
 
                 EvolvePopulation();
-                _currentGeneration++;
             }
         }
 
@@ -135,18 +285,33 @@ namespace ML
         {
             var fitness = 0f;
 
-            // crashed, failed
-            if (!ship.isActiveAndEnabled)
+            var position = ship.Rb.position;
+            var velocity = ship.Rb.linearVelocity;
+
+            var orbit = OrbitDescription.Calculate(position, velocity);
+
+            var planetRadius = Environment.Instance.PlanetRadius;
+            var atmosphereRadius = Environment.Instance.AtmosphereRadius;
+
+            var goalOrbitAltitude = atmosphereRadius + 500f;
+            // var apoapsisProgress = (orbit.Apoapsis - planetRadius) / (goalOrbitAltitude - planetRadius);
+            var periapsisProgress = orbit.Periapsis / goalOrbitAltitude;
+
+            fitness += ship.HighestAtmosphereProgress * 0.01f; // 0 - 0.01 to nudge off ground
+
+            // reward for higher periapsis
+            fitness += periapsisProgress;
+
+            // bonus for more circular orbits
+            fitness += Mathf.Clamp01(1f - orbit.Eccentricity) * 2f;
+
+            // immediately reward any kind of stable orbit
+            if (orbit.IsStable)
             {
-                return -1f;
+                fitness += 5f;
             }
 
-            // todo detect if in orbit
-            // todo detect circularity of orbit
-
-            fitness += ship.PlanetaryPhysics.GetAltitude(ship.Rb.position);
-
-            return Mathf.Max(0f, fitness);
+            return fitness;
         }
 
         private void EvolvePopulation()
