@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6452739993571103706}
-  - component: {fileID: 2711249899630872674}
   - component: {fileID: 8237354141985109409}
+  - component: {fileID: 2711249899630872674}
   m_Layer: 7
   m_Name: FuelTank
   m_TagString: Untagged
@@ -33,21 +33,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2711249899630872674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7103520420506547219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
-  BaseWeight: 100
-  StoredFuelKg: 1000
-  MaxFuelKg: 1000
 --- !u!212 &8237354141985109409
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -106,3 +91,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2711249899630872674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103520420506547219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94ef7466f586486b9b96dcbfa3f89f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FuelTank
+  BaseWeight: 100
+  StoredFuelKg: 1000
+  MaxFuelKg: 1000

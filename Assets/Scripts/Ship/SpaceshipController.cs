@@ -62,7 +62,7 @@ namespace Ship
 
         private SpaceshipStage _topLevelStage;
         [SerializeField] private StageGroup _boosterStageGroup;
-        [SerializeField] private StageGroup _firstStageGroup;
+        [SerializeField] private StageGroup _heavyStageGroup;
 
         private float[] _inputs;
 
@@ -96,9 +96,9 @@ namespace Ship
             _inputs[3] = Mathf.Clamp(Rb.angularVelocity / 360f, -1, 1);
             _inputs[4] = NormalizeRotation(Rb.rotation);
             _inputs[5] = _topLevelStage.GetFuelRemaining();
-            _inputs[6] = _firstStageGroup.GetAverageFuelRemaining();
+            _inputs[6] = _heavyStageGroup.GetAverageFuelRemaining();
             _inputs[7] = _boosterStageGroup.GetAverageFuelRemaining();
-            _inputs[8] = _firstStageGroup.Separated ? 1f : -1f;
+            _inputs[8] = _heavyStageGroup.Separated ? 1f : -1f;
             _inputs[9] = _boosterStageGroup.Separated ? 1f : -1f;
 
             return _inputs;
@@ -121,16 +121,16 @@ namespace Ship
             var thrustControl = Mathf.Clamp01(outputs[0] * 0.5f + 0.5f);
             var steeringControl = Mathf.Clamp(outputs[1], -1f, 1f);
             var separateBoosterStage = outputs[2] > 0f;
-            var separateFirstStage = outputs[3] > 0f;
+            var separateHeavyStage = outputs[3] > 0f;
 
-            if (separateBoosterStage && !_boosterStageGroup.Separated && !_firstStageGroup.Separated)
+            if (separateBoosterStage && !_boosterStageGroup.Separated && !_heavyStageGroup.Separated)
             {
                 _boosterStageGroup.Separate();
             }
 
-            if (separateFirstStage && !_firstStageGroup.Separated)
+            if (separateHeavyStage && !_heavyStageGroup.Separated)
             {
-                _firstStageGroup.Separate();
+                _heavyStageGroup.Separate();
             }
 
             if (!_boosterStageGroup.Separated)
@@ -139,10 +139,10 @@ namespace Ship
                 _boosterStageGroup.SetMasterSteering(steeringControl);
             }
 
-            if (!_firstStageGroup.Separated)
+            if (!_heavyStageGroup.Separated)
             {
-                _firstStageGroup.SetMasterThrust(thrustControl);
-                _firstStageGroup.SetMasterSteering(steeringControl);
+                _heavyStageGroup.SetMasterThrust(thrustControl);
+                _heavyStageGroup.SetMasterSteering(steeringControl);
             }
             else
             {
@@ -160,9 +160,9 @@ namespace Ship
             {
                 group = _boosterStageGroup;
             }
-            else if (!_firstStageGroup.Separated)
+            else if (!_heavyStageGroup.Separated)
             {
-                group = _firstStageGroup;
+                group = _heavyStageGroup;
             }
 
             group?.Separate();
@@ -177,7 +177,7 @@ namespace Ship
 
             // note: order matters (children first), todo: find a nice way to make it not matter or enforce it
             _boosterStageGroup.ReinitialiseAll();
-            _firstStageGroup.ReinitialiseAll();
+            _heavyStageGroup.ReinitialiseAll();
             _topLevelStage.Reinitialise();
         }
     }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1463739019729118888}
   - component: {fileID: 1970484941876590793}
   m_Layer: 7
-  m_Name: LaunchStage
+  m_Name: HeavyStage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -490,13 +490,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Spaceship
   _useBrain: 1
   PlanetaryPhysics: {fileID: 0}
-  _networkShape: 0a0000000800000004000000
+  _hiddenLayers: 0c000000
   _boosterStageGroup:
     Stages:
     - {fileID: 8509284842110399341}
     - {fileID: 2114942806489753056}
     Separated: 0
-  _firstStageGroup:
+  _heavyStageGroup:
     Stages:
     - {fileID: 343122713911733459}
     Separated: 0
