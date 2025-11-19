@@ -110,8 +110,7 @@ namespace ML
 
                 var maxFitness = _fitnessScores.Max();
                 var avgFitness = _fitnessScores.Average();
-                var highestShip = _population[_fitnessScores.IndexOf(maxFitness)];
-                Debug.Log($"Highest fitness: {maxFitness} ({highestShip}), average: {avgFitness}");
+                Debug.Log($"Avg. <color=cyan>{avgFitness:F2}</color>, max. <color=yellow>{maxFitness:F2}</color>");
 
                 EvolvePopulation();
                 CurrentGeneration++;
