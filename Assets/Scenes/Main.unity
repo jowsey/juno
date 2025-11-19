@@ -1807,10 +1807,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ML.SimulationManager
   SpeedTrainingMode: 0
-  _hiddenLayers: 18000000
+  _hiddenLayers: 09000000
   _maxGenerations: 500
   _populationSize: 100
-  _generationDuration: 150
+  _generationDuration: 180
   _eliteCount: 5
   _mutationRate: 0.02
   _mutationStrength: 0.3
@@ -2947,6 +2947,8 @@ MonoBehaviour:
   _zoomRelativeMoveSpeed: 2
   _minZoom: 5
   _maxZoom: 2000
+  _zoomSpeedLog: 1.1
+  _baseZoomSpeed: 0.4
   FollowTarget: {fileID: 0}
 --- !u!1 &1942174108
 GameObject:
