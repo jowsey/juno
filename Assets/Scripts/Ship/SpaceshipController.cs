@@ -54,7 +54,10 @@ namespace Ship
 
         [HideInInspector] public PlanetaryPhysics PlanetaryPhysics;
 
-        [SerializeField] private int[] _networkShape = { 10, 8, 4 };
+        private const int InputCount = 10;
+        private const int OutputCount = 4;
+
+        [SerializeField] private int[] _hiddenLayers = { 12 };
         public NeuralNetwork Brain;
 
         private SpaceshipStage _topLevelStage;
@@ -71,13 +74,18 @@ namespace Ship
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
-            _inputs = new float[_networkShape[0]];
+            _inputs = new float[InputCount];
         }
 
         private void Start()
         {
-            Debug.Log("Creating brain with shape " + string.Join("-", _networkShape));
-            Brain = new NeuralNetwork(_networkShape);
+            var networkShape = new int[_hiddenLayers.Length + 2];
+            networkShape[0] = InputCount; // inputs
+            Array.Copy(_hiddenLayers, 0, networkShape, 1, _hiddenLayers.Length);
+            networkShape[^1] = OutputCount; // outputs
+
+            Debug.Log("Creating brain with shape " + string.Join("-", networkShape));
+            Brain = new NeuralNetwork(networkShape);
         }
 
         private float[] GetNormalizedInputs()
