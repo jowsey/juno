@@ -104,7 +104,7 @@ namespace ML
                         }
                     }
 
-                    _biases[i][j] = 0f;
+                    _biases[i][j] = randomize ? Random.Range(-0.5f, 0.5f) * scale : 0f;
                 }
             }
         }
