@@ -167,9 +167,10 @@ namespace Ship
 
             gameObject.SetActive(true);
 
-            _topLevelStage.Reinitialise();
-            _firstStageGroup.ReinitialiseAll();
+            // note: order matters (children first), todo: find a nice way to make it not matter or enforce it
             _boosterStageGroup.ReinitialiseAll();
+            _firstStageGroup.ReinitialiseAll();
+            _topLevelStage.Reinitialise();
         }
     }
 }

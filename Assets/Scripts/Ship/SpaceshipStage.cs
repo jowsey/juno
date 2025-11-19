@@ -106,7 +106,7 @@ namespace Ship
             _engineTransforms = engineTransforms.ToArray();
             _fuelTanks = fuelTanks.ToArray();
 
-            RecalculateLinkedMass();
+            if (IsRootStage) RecalculateLinkedMass();
         }
 
         private void RecalculateLinkedMass()
@@ -335,11 +335,13 @@ namespace Ship
             {
                 part.Reinitialise();
             }
-            
+
             if (_fairing) _fairing.SetActive(true);
 
             if (_originalParent) transform.parent = _originalParent;
             transform.SetLocalPositionAndRotation(_originalLocalPosition, _originalLocalRotation);
+
+            RescanParts();
         }
     }
 }
