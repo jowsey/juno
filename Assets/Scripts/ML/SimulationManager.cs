@@ -13,8 +13,13 @@ namespace ML
     {
         private int _currentGeneration = 1;
 
+        private const int InputCount = 10;
+        private const int OutputCount = 4;
+
         [Header("Generation parameters")] [SerializeField]
-        private int _maxGenerations = 100;
+        private int[] _hiddenLayers = { 12 };
+
+        [SerializeField] private int _maxGenerations = 100;
 
         [SerializeField] private int _populationSize = 100;
         [SerializeField] private float _generationDuration = 90f;
@@ -46,10 +51,19 @@ namespace ML
 
         private void Start()
         {
+            var networkShape = new int[_hiddenLayers.Length + 2];
+            networkShape[0] = InputCount; // inputs
+            Array.Copy(_hiddenLayers, 0, networkShape, 1, _hiddenLayers.Length);
+            networkShape[^1] = OutputCount; // outputs
+
+            Debug.Log("Creating brains with shape " + string.Join("-", networkShape));
+
             for (var i = 0; i < _populationSize; i++)
             {
                 var ship = Instantiate(_spaceshipPrefab, _spawnPosition, Quaternion.identity);
                 ship.transform.parent = _shipContainer;
+
+                ship.Brain = new NeuralNetwork(networkShape);
 
                 _population.Add(ship);
                 _fitnessScores.Add(0f);
