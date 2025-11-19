@@ -78,18 +78,18 @@ namespace Ship
             _inputs[0] = PlanetaryPhysics.GetAtmosphereProgress(Rb.position);
             _inputs[1] = Rb.linearVelocity.x / 500f;
             _inputs[2] = Rb.linearVelocity.y / 500f;
-            _inputs[3] = Mathf.Clamp(Rb.angularVelocity / 360f, -1, 1);
+            _inputs[3] = Mathf.Clamp(Rb.angularVelocity / SpaceshipStage.AngularVelocityExplodeThreshold, -1, 1);
             _inputs[4] = NormalizeRotation(Rb.rotation);
             _inputs[5] = _topLevelStage.GetFuelRemaining();
-            _inputs[6] = _heavyStageGroup.GetAverageFuelRemaining();
-            _inputs[7] = _boosterStageGroup.GetAverageFuelRemaining();
+            _inputs[6] = _heavyStageGroup.Separated ? 0f : _heavyStageGroup.GetAverageFuelRemaining();
+            _inputs[7] = _boosterStageGroup.Separated ? 0f : _boosterStageGroup.GetAverageFuelRemaining();
             _inputs[8] = _heavyStageGroup.Separated ? 1f : -1f;
             _inputs[9] = _boosterStageGroup.Separated ? 1f : -1f;
 
             return _inputs;
         }
 
-        private float NormalizeRotation(float rotation)
+        private static float NormalizeRotation(float rotation)
         {
             rotation %= 360f;
             if (rotation > 180f) rotation -= 360f;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Ship;
 using TMPro;
@@ -13,7 +14,11 @@ namespace ML
 {
     public class SimulationManager : MonoBehaviour
     {
-        private int _currentGeneration = 1;
+        public static SimulationManager Instance { get; private set; }
+
+        public bool SpeedTrainingMode;
+
+        private int _currentGeneration;
 
         public const int InputCount = 10;
         public const int OutputCount = 4;
@@ -30,11 +35,16 @@ namespace ML
         [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
         [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.1f;
 
+        [Header("Fitness")] [SerializeField] private float _periapsisWeight = 1f;
+        [SerializeField] private float _eccentricityWeight = 3f;
+        [SerializeField] private float _stableOrbitBonus = 10f;
+
         [Header("Ship")] [SerializeField] private SpaceshipController _spaceshipPrefab;
         [SerializeField] private Vector3 _spawnPosition;
         [SerializeField] private Transform _shipContainer;
 
         [Header("UI")] [SerializeField] private TextMeshProUGUI _timerText;
+        [SerializeField] private Image _timerProgressBar;
         [SerializeField] private TextMeshProUGUI _generationText;
         [SerializeField] private TextMeshProUGUI _fitnessText;
         [SerializeField] private TMP_InputField _speedInput;
@@ -48,6 +58,8 @@ namespace ML
 
         private void Awake()
         {
+            Instance = this;
+
             _population = new List<SpaceshipController>(_populationSize);
             _fitnessScores = new List<float>(_populationSize);
 
@@ -83,19 +95,33 @@ namespace ML
 
         private void LateUpdate()
         {
+            if (Keyboard.current.digit1Key.wasPressedThisFrame) Time.timeScale = 1f;
+            if (Keyboard.current.digit2Key.wasPressedThisFrame) Time.timeScale = 5f;
+            if (Keyboard.current.digit3Key.wasPressedThisFrame) Time.timeScale = 10f;
+            if (Keyboard.current.digit4Key.wasPressedThisFrame) Time.timeScale = 60f;
+            if (Keyboard.current.digit5Key.wasPressedThisFrame) Time.timeScale = 100f;
+
+            SpeedTrainingMode = Time.timeScale >= 60f;
+
             if (!_speedInput.isFocused)
             {
                 _speedInput.text = Time.timeScale.ToString("N0");
             }
 
-            if (Keyboard.current.digit1Key.wasPressedThisFrame) Time.timeScale = 1f;
-            if (Keyboard.current.digit2Key.wasPressedThisFrame) Time.timeScale = 2f;
-            if (Keyboard.current.digit3Key.wasPressedThisFrame) Time.timeScale = 12f;
-            if (Keyboard.current.digit4Key.wasPressedThisFrame) Time.timeScale = 60f;
-            if (Keyboard.current.digit5Key.wasPressedThisFrame) Time.timeScale = 100f;
-
             var timespan = TimeSpan.FromSeconds(Time.time - _generationStartTime);
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
+
+            var progress = Mathf.Clamp01((Time.time - _generationStartTime) / _generationDuration);
+            if (_currentGeneration % 2 == 0)
+            {
+                _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Right;
+                _timerProgressBar.fillAmount = 1f - progress;
+            }
+            else
+            {
+                _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Left;
+                _timerProgressBar.fillAmount = progress;
+            }
         }
 
         private void OnSpeedValueChanged(string input)
@@ -115,14 +141,18 @@ namespace ML
                 _maxGenerations.ToString(),
                 _populationSize.ToString(),
                 _eliteCount.ToString(),
-                _mutationRate.ToString("F6"),
-                _mutationStrength.ToString("F6")
+                _mutationRate.ToString("F6", CultureInfo.InvariantCulture),
+                _mutationStrength.ToString("F6", CultureInfo.InvariantCulture),
+                // rewards
+                _periapsisWeight.ToString("F6", CultureInfo.InvariantCulture),
+                _eccentricityWeight.ToString("F6", CultureInfo.InvariantCulture),
+                _stableOrbitBonus.ToString("F6", CultureInfo.InvariantCulture),
             };
 
             foreach (var ship in _population)
             {
                 var weights = ship.Brain.GetFlatWeights();
-                var weightStrings = weights.Select(w => w.ToString("F6"));
+                var weightStrings = weights.Select(w => w.ToString("F6", CultureInfo.InvariantCulture));
                 stateStrings.Add(string.Join(",", weightStrings));
             }
 
@@ -140,18 +170,30 @@ namespace ML
                 var fullState = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
                 var stateLines = fullState.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
+                const int numParameters = 9;
+
                 _currentGeneration = int.Parse(stateLines[0]);
                 _maxGenerations = int.Parse(stateLines[1]);
                 _populationSize = int.Parse(stateLines[2]);
                 _eliteCount = int.Parse(stateLines[3]);
-                _mutationRate = float.Parse(stateLines[4]);
-                _mutationStrength = float.Parse(stateLines[5]);
+                _mutationRate = float.Parse(stateLines[4], CultureInfo.InvariantCulture);
+                _mutationStrength = float.Parse(stateLines[5], CultureInfo.InvariantCulture);
+                // rewards
+                _periapsisWeight = float.Parse(stateLines[6], CultureInfo.InvariantCulture);
+                _eccentricityWeight = float.Parse(stateLines[7], CultureInfo.InvariantCulture);
+                _stableOrbitBonus = float.Parse(stateLines[8], CultureInfo.InvariantCulture);
+
+                if (_populationSize != _population.Count)
+                {
+                    throw new Exception($"Population size mismatch. (Expected {_population.Count}, got {_populationSize})");
+                }
 
                 for (var i = 0; i < _population.Count; i++)
                 {
-                    var weightStrings = stateLines[6 + i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    var weights = weightStrings.Select(w => float.Parse(w)).ToArray();
+                    var weightStrings = stateLines[numParameters + i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var weights = weightStrings.Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
                     _population[i].Brain.SetFlatWeights(weights);
+                    _fitnessScores[i] = 0f;
                 }
 
                 Debug.Log("<color=cyan>Loaded state from clipboard.</color>");
@@ -185,11 +227,10 @@ namespace ML
 
         private IEnumerator TrainingLoop()
         {
-            // we do everything through physics, so disable auto-sync
-            Physics2D.autoSyncTransforms = false;
-
-            while (_currentGeneration <= _maxGenerations)
+            while (_currentGeneration < _maxGenerations)
             {
+                _currentGeneration++;
+
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
                 _generationStartTime = Time.time;
 
@@ -220,42 +261,39 @@ namespace ML
                 UpdateFitnessUI(prevAverage, prevMax);
 
                 EvolvePopulation();
-                _currentGeneration++;
             }
         }
 
         private float EvaluateFitness(SpaceshipController ship)
         {
             // crashed, failed
-            if (!ship.isActiveAndEnabled) return 0f;
+            if (!ship.isActiveAndEnabled) return -1f;
 
             var fitness = 0f;
 
             var position = ship.Rb.position;
             var velocity = ship.Rb.linearVelocity;
 
+            var distanceFromLaunch = Vector2.Distance(position, _spawnPosition);
+            fitness += distanceFromLaunch * 0.0001f; // small reward for getting a move on
+
             var orbit = OrbitDescription.Calculate(position, velocity);
 
-            var planetRadius = Environment.Instance.PlanetRadius;
             var atmosphereRadius = Environment.Instance.AtmosphereRadius;
+            var minOrbitAltitude = atmosphereRadius + 500f;
 
-            var minOrbitAltitude = (atmosphereRadius - planetRadius) + 500f;
+            // reward for higher periapsis
+            fitness += (orbit.Periapsis / minOrbitAltitude) * _periapsisWeight;
 
-            var apoapsisAltitude = orbit.Apoapsis - planetRadius;
-            var periapsisAltitude = orbit.Periapsis - planetRadius;
-
-            // reward getting apoapsis & periapsis up
-            fitness += Mathf.Clamp01(apoapsisAltitude / minOrbitAltitude);
-            fitness += Mathf.Clamp01(periapsisAltitude / minOrbitAltitude);
+            // bonus for more circular orbits
+            fitness += Mathf.Clamp01(1f - orbit.Eccentricity) * _eccentricityWeight;
 
             // immediately reward any kind of stable orbit
             if (orbit.IsStable)
             {
-                fitness += 1f;
-
-                // bonus for more circular orbits
-                fitness += 1f - orbit.Eccentricity;
+                fitness += _stableOrbitBonus;
             }
+
 
             return fitness;
         }

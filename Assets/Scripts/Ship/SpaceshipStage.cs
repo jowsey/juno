@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ML;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -23,10 +24,10 @@ namespace Ship
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
 
-        private const float RelativeSeparationForce = 2f;
+        public const float RelativeSeparationForce = 2f;
 
-        private const float CrashVelocityThreshold = 5f;
-        private const float AngularVelocityExplodeThreshold = 1800f;
+        public const float CrashVelocityThreshold = 3.5f;
+        public const float AngularVelocityExplodeThreshold = 1800f;
 
         [SerializeField] private bool _fixCenterOfMass = true;
         [SerializeField] private GameObject _fairing;
@@ -245,6 +246,14 @@ namespace Ship
         public void Separate()
         {
             if (IsRootStage) return;
+
+            if (SimulationManager.Instance.SpeedTrainingMode)
+            {
+                gameObject.SetActive(false);
+                _parentStage.RescanParts();
+                return;
+            }
+
             IsRootStage = true;
 
             if (_fairing) _fairing.SetActive(false);
@@ -298,10 +307,13 @@ namespace Ship
 
         public void Explode(bool tellParent = true)
         {
-            foreach (var part in _stageParts)
+            if (!SimulationManager.Instance.SpeedTrainingMode)
             {
-                var fx = Instantiate(_explosionPrefab, part.transform.position, Quaternion.identity);
-                fx.transform.parent = Ship.transform.parent;
+                foreach (var part in _stageParts)
+                {
+                    var fx = Instantiate(_explosionPrefab, part.transform.position, Quaternion.identity);
+                    fx.transform.parent = Ship.transform.parent;
+                }
             }
 
             // propagate downwards

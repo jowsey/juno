@@ -11,7 +11,7 @@ namespace Ship
 
         [SerializeField] private float _airDensityFalloff = 5f;
         [SerializeField] private float _dragCoefficient = 20f;
-        [SerializeField] private float _angularDamping = 100f;
+        [SerializeField] private float _angularDamping = 4f;
 
         private void Awake()
         {
@@ -30,11 +30,8 @@ namespace Ship
         public float GetAtmosphereProgress(Vector2 position)
         {
             var env = Environment.Instance;
-            var distanceToCore = Vector2.Distance(position, env.PlanetPosition);
-            return Mathf.Clamp01(
-                (distanceToCore - env.PlanetRadius) /
-                (env.AtmosphereRadius - env.PlanetRadius)
-            );
+            var altitude = GetAltitude(position);
+            return altitude / (env.AtmosphereRadius - env.PlanetRadius);
         }
 
         public float GetGravity(Vector2 position)

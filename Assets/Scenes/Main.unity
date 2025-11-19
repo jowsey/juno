@@ -150,6 +150,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1452712750}
+  - {fileID: 620336836}
   m_Father: {fileID: 204477673}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -427,10 +428,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4916359}
   - {fileID: 527588667}
-  - {fileID: 1480903707}
+  - {fileID: 4916359}
   - {fileID: 1259137382}
+  - {fileID: 1480903707}
   - {fileID: 1786280818}
   - {fileID: 1770888693}
   m_Father: {fileID: 0}
@@ -474,6 +475,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &432811302
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -519,6 +521,7 @@ SpriteRenderer:
   m_SortingLayerID: -1488322823
   m_SortingLayer: -1
   m_SortingOrder: -1
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.75, g: 0.98055553, b: 1, a: 1}
   m_FlipX: 0
@@ -528,7 +531,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &452821233
 GameObject:
@@ -1098,6 +1100,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 979885056}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &620336835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 620336836}
+  - component: {fileID: 620336838}
+  - component: {fileID: 620336837}
+  m_Layer: 5
+  m_Name: ProgressBar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &620336836
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620336835}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4916359}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &620336837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620336835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.12156863}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 945836f5e9ff2e9489decfb5685c3336, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 0
+  m_FillAmount: 0
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &620336838
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620336835}
+  m_CullTransparentMesh: 1
 --- !u!1 &723800019
 GameObject:
   m_ObjectHideFlags: 0
@@ -1607,17 +1684,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbff2cc13dcb4be18fb4128195cc1577, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ML.SimulationManager
-  _hiddenLayers: 10000000
-  _maxGenerations: 100
-  _populationSize: 100
+  SpeedTrainingMode: 0
+  _hiddenLayers: 1000000008000000
+  _maxGenerations: 500
+  _populationSize: 125
   _generationDuration: 120
   _eliteCount: 5
-  _mutationRate: 0.03
-  _mutationStrength: 0.1
+  _mutationRate: 0.02
+  _mutationStrength: 0.2
+  _periapsisWeight: 2
+  _eccentricityWeight: 1
+  _stableOrbitBonus: 10
   _spaceshipPrefab: {fileID: 7247496989856108138, guid: e086e47e1897443f298d2392860d479a, type: 3}
   _spawnPosition: {x: 0, y: 12.1, z: 0}
   _shipContainer: {fileID: 1911069517}
   _timerText: {fileID: 1452712751}
+  _timerProgressBar: {fileID: 620336837}
   _generationText: {fileID: 493725520}
   _fitnessText: {fileID: 1857729601}
   _speedInput: {fileID: 1259137383}
@@ -2694,6 +2776,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1979771311
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2739,6 +2822,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 7deddaf56b12c4f47a7eede7ed17a264, type: 3}
   m_Color: {r: 0.5529412, g: 0.6, b: 0.6431373, a: 1}
   m_FlipX: 0
@@ -2748,7 +2832,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!60 &1979771312
 PolygonCollider2D:
@@ -2820,6 +2903,7 @@ GameObject:
   m_IsActive: 1
 --- !u!212 &2091774201
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2865,6 +2949,7 @@ SpriteRenderer:
   m_SortingLayerID: -1488322823
   m_SortingLayer: -1
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.7607843, g: 0.8392157, b: 0.30980393, a: 1}
   m_FlipX: 0
@@ -2874,7 +2959,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &2091774202
 Transform:
