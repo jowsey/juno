@@ -335,6 +335,8 @@ namespace Ship
             {
                 part.Reinitialise();
             }
+            
+            if (_fairing) _fairing.SetActive(true);
 
             if (_originalParent) transform.parent = _originalParent;
             transform.SetLocalPositionAndRotation(_originalLocalPosition, _originalLocalRotation);
