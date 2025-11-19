@@ -15,7 +15,6 @@ namespace ML
         private int _maxGenerations = 100;
 
         [SerializeField] private int _populationSize = 100;
-        [SerializeField] private float _trainingTimeScale = 1f;
         [SerializeField] private float _generationDuration = 60f;
 
         [SerializeField] private int _eliteCount = 10;
@@ -30,6 +29,7 @@ namespace ML
 
         [Header("UI")] [SerializeField] private TextMeshProUGUI _timerText;
         [SerializeField] private TextMeshProUGUI _generationText;
+        [SerializeField] private TMP_InputField _speedInput;
 
         private float _generationStartTime;
 
@@ -40,6 +40,8 @@ namespace ML
         {
             _population = new List<SpaceshipController>(_populationSize);
             _fitnessScores = new List<float>(_populationSize);
+
+            _speedInput.onEndEdit.AddListener(OnSpeedInputEndEdit);
         }
 
         private void Start()
@@ -56,19 +58,27 @@ namespace ML
             StartCoroutine(TrainingLoop());
         }
 
-        private void Update()
-        {
-            Time.timeScale = _trainingTimeScale;
-        }
-
         private void LateUpdate()
         {
+            if (!_speedInput.isFocused)
+            {
+                _speedInput.text = Time.timeScale.ToString("N0");
+            }
+
             var timespan = TimeSpan.FromSeconds(Time.time - _generationStartTime);
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
 
             var maxNumDigits = _maxGenerations.ToString().Length;
             var currentGenStr = CurrentGeneration.ToString().PadLeft(maxNumDigits, '0');
             _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
+        }
+
+        private void OnSpeedInputEndEdit(string input)
+        {
+            if (int.TryParse(input, out var timeScale))
+            {
+                Time.timeScale = timeScale;
+            }
         }
 
         private IEnumerator TrainingLoop()
