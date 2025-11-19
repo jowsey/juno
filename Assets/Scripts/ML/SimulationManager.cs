@@ -41,7 +41,7 @@ namespace ML
             _population = new List<SpaceshipController>(_populationSize);
             _fitnessScores = new List<float>(_populationSize);
 
-            _speedInput.onEndEdit.AddListener(OnSpeedInputEndEdit);
+            _speedInput.onValueChanged.AddListener(OnSpeedValueChanged);
         }
 
         private void Start()
@@ -73,7 +73,7 @@ namespace ML
             _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
         }
 
-        private void OnSpeedInputEndEdit(string input)
+        private void OnSpeedValueChanged(string input)
         {
             if (int.TryParse(input, out var timeScale))
             {
