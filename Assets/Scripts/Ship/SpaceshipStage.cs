@@ -33,13 +33,13 @@ namespace Ship
         [SerializeField] private Vector3 _separateDirection;
 
         // parts directly owned by this stage
-        private List<BodyPart> _stageParts = new();
-        private List<Engine> _engines = new();
-        private List<Transform> _engineTransforms = new();
-        private List<FuelTank> _fuelTanks = new();
+        private BodyPart[] _stageParts;
+        private Engine[] _engines;
+        private Transform[] _engineTransforms;
+        private FuelTank[] _fuelTanks;
 
         // all parts connected to this stage (including child stages)
-        private List<BodyPart> _allOwnedParts = new();
+        private BodyPart[] _allOwnedParts;
 
         // allows child stages to detach themselves from us
         private UnityEvent _onExplode = new();
@@ -79,26 +79,32 @@ namespace Ship
 
         public void RescanParts()
         {
-            _stageParts.Clear();
-            _engines.Clear();
-            _engineTransforms.Clear();
-            _fuelTanks.Clear();
+            var stageParts = new List<BodyPart>();
+            var engines = new List<Engine>();
+            var engineTransforms = new List<Transform>();
+            var fuelTanks = new List<FuelTank>();
 
             foreach (Transform child in transform)
             {
                 if (!child.TryGetComponent<BodyPart>(out var part)) continue;
-                _stageParts.Add(part);
+                stageParts.Add(part);
 
                 if (part is Engine engine)
                 {
-                    _engines.Add(engine);
-                    _engineTransforms.Add(engine.transform);
+                    engines.Add(engine);
+                    engineTransforms.Add(engine.transform);
                 }
 
-                if (part is FuelTank tank) _fuelTanks.Add(tank);
+                if (part is FuelTank tank) fuelTanks.Add(tank);
             }
 
-            GetComponentsInChildren<BodyPart>(_allOwnedParts);
+            _allOwnedParts = GetComponentsInChildren<BodyPart>();
+
+            // cache arrays for enumerator performance
+            _stageParts = stageParts.ToArray();
+            _engines = engines.ToArray();
+            _engineTransforms = engineTransforms.ToArray();
+            _fuelTanks = fuelTanks.ToArray();
 
             RecalculateLinkedMass();
         }
@@ -132,7 +138,7 @@ namespace Ship
             var totalFuel = 0f;
             var totalFuelCapacity = 0f;
 
-            for (var i = 0; i < _fuelTanks.Count; i++)
+            for (var i = 0; i < _fuelTanks.Length; i++)
             {
                 var tank = _fuelTanks[i];
                 totalFuel += tank.StoredFuelKg;
@@ -146,7 +152,7 @@ namespace Ship
 
         public void SetThrustControl(float level)
         {
-            for (var i = 0; i < _engines.Count; i++)
+            for (var i = 0; i < _engines.Length; i++)
             {
                 var engine = _engines[i];
                 engine.ThrustControl = Mathf.Clamp01(level);
@@ -155,7 +161,7 @@ namespace Ship
 
         public void SetSteeringControl(float level)
         {
-            for (var i = 0; i < _engines.Count; i++)
+            for (var i = 0; i < _engines.Length; i++)
             {
                 var engine = _engines[i];
                 engine.SteeringControl = Mathf.Clamp(level, -1f, 1f);
@@ -178,7 +184,7 @@ namespace Ship
             }
 
             var linkedFuelAvailable = 0f;
-            for (var i = 0; i < _fuelTanks.Count; i++)
+            for (var i = 0; i < _fuelTanks.Length; i++)
             {
                 var tank = _fuelTanks[i];
                 linkedFuelAvailable += tank.StoredFuelKg;
@@ -186,8 +192,8 @@ namespace Ship
 
             var totalFuelUsage = 0f;
             // distribute fuel evenly among engines (prevents a tick where one engine runs and others dont)
-            var maxPerEngineFuelBudget = linkedFuelAvailable / Mathf.Max(1, _engines.Count);
-            for (var i = 0; i < _engines.Count; i++)
+            var maxPerEngineFuelBudget = linkedFuelAvailable / Mathf.Max(1, _engines.Length);
+            for (var i = 0; i < _engines.Length; i++)
             {
                 var engine = _engines[i];
                 var engineTransform = _engineTransforms[i];
@@ -231,7 +237,7 @@ namespace Ship
             Rb.mass -= totalFuelUsage;
 
             // consume fuel from tanks
-            for (var i = 0; i < _fuelTanks.Count; i++)
+            for (var i = 0; i < _fuelTanks.Length; i++)
             {
                 var tank = _fuelTanks[i];
 
