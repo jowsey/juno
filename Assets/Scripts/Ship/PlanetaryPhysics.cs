@@ -65,7 +65,8 @@ namespace Ship
             _rb.AddForce(drag, ForceMode2D.Force);
 
             // angular drag
-            _rb.angularDamping = _angularDamping * airDensity;
+            var angularSpeed = Mathf.Abs(_rb.angularVelocity);
+            _rb.angularDamping = _angularDamping * (airDensity * angularSpeed * angularSpeed);
         }
     }
 }
