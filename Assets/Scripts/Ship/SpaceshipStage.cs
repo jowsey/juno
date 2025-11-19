@@ -138,9 +138,8 @@ namespace Ship
             var totalFuel = 0f;
             var totalFuelCapacity = 0f;
 
-            for (var i = 0; i < _fuelTanks.Length; i++)
+            foreach (var tank in _fuelTanks)
             {
-                var tank = _fuelTanks[i];
                 totalFuel += tank.StoredFuelKg;
                 totalFuelCapacity += tank.MaxFuelKg;
             }
@@ -152,18 +151,16 @@ namespace Ship
 
         public void SetThrustControl(float level)
         {
-            for (var i = 0; i < _engines.Length; i++)
+            foreach (var engine in _engines)
             {
-                var engine = _engines[i];
                 engine.ThrustControl = Mathf.Clamp01(level);
             }
         }
 
         public void SetSteeringControl(float level)
         {
-            for (var i = 0; i < _engines.Length; i++)
+            foreach (var engine in _engines)
             {
-                var engine = _engines[i];
                 engine.SteeringControl = Mathf.Clamp(level, -1f, 1f);
             }
         }
@@ -184,9 +181,8 @@ namespace Ship
             }
 
             var linkedFuelAvailable = 0f;
-            for (var i = 0; i < _fuelTanks.Length; i++)
+            foreach (var tank in _fuelTanks)
             {
-                var tank = _fuelTanks[i];
                 linkedFuelAvailable += tank.StoredFuelKg;
             }
 
@@ -237,10 +233,8 @@ namespace Ship
             Rb.mass -= totalFuelUsage;
 
             // consume fuel from tanks
-            for (var i = 0; i < _fuelTanks.Length; i++)
+            foreach (var tank in _fuelTanks)
             {
-                var tank = _fuelTanks[i];
-
                 var fuelToConsume = Mathf.Min(tank.StoredFuelKg, totalFuelUsage);
                 tank.StoredFuelKg -= fuelToConsume;
                 totalFuelUsage -= fuelToConsume;
