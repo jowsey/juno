@@ -2,24 +2,28 @@ using UnityEngine;
 
 public class Environment : MonoBehaviour
 {
+    public static Environment Instance { get; private set; }
+
     [field: SerializeField] public Transform EarthCore { get; private set; }
 
     [field: SerializeField] public Transform EarthAtmosphere { get; private set; }
 
-    public float EarthCoreRadius { get; private set; }
+    public float PlanetRadius { get; private set; }
 
-    public float EarthAtmosphereRadius { get; private set; }
+    public float AtmosphereRadius { get; private set; }
 
-    public Vector2 EarthCorePosition { get; private set; }
+    public Vector2 PlanetPosition { get; private set; }
 
-    public Vector2 EarthAtmospherePosition { get; private set; }
+    public Vector2 AtmospherePosition { get; private set; }
 
     private void Awake()
     {
-        EarthCoreRadius = EarthCore.lossyScale.x * 0.5f;
-        EarthAtmosphereRadius = EarthAtmosphere.lossyScale.x * 0.5f;
+        Instance = this;
 
-        EarthCorePosition = EarthCore.position;
-        EarthAtmospherePosition = EarthAtmosphere.position;
+        PlanetRadius = EarthCore.lossyScale.x * 0.5f;
+        AtmosphereRadius = EarthAtmosphere.lossyScale.x * 0.5f;
+
+        PlanetPosition = EarthCore.position;
+        AtmospherePosition = EarthAtmosphere.position;
     }
 }

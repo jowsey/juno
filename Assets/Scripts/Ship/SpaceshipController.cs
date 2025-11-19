@@ -54,9 +54,6 @@ namespace Ship
 
         [HideInInspector] public PlanetaryPhysics PlanetaryPhysics;
 
-        private const int InputCount = 10;
-        private const int OutputCount = 4;
-        
         public NeuralNetwork Brain;
 
         private SpaceshipStage _topLevelStage;
@@ -73,7 +70,7 @@ namespace Ship
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
-            _inputs = new float[InputCount];
+            _inputs = new float[SimulationManager.InputCount];
         }
 
         private float[] GetNormalizedInputs()

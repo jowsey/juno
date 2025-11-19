@@ -5,8 +5,9 @@ namespace Ship
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlanetaryPhysics : MonoBehaviour
     {
-        private const float SurfaceGravity = 9.81f;
-        private static Environment _env;
+        public const float SurfaceGravity = 9.81f;
+
+        private static Environment _env => Environment.Instance;
 
         private Rigidbody2D _rb;
 
@@ -16,32 +17,30 @@ namespace Ship
 
         private void Awake()
         {
-            if (!_env) _env = FindAnyObjectByType<Environment>();
-
             _rb = GetComponent<Rigidbody2D>();
             _rb.gravityScale = 0f;
         }
 
         public float GetAltitude(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(position, _env.EarthCorePosition);
-            var altitude = distanceToCore - _env.EarthCoreRadius;
+            var distanceToCore = Vector2.Distance(position, _env.PlanetPosition);
+            var altitude = distanceToCore - _env.PlanetRadius;
             return Mathf.Max(0f, altitude);
         }
 
         public float GetAtmosphereProgress(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(position, _env.EarthCorePosition);
+            var distanceToCore = Vector2.Distance(position, _env.PlanetPosition);
             return Mathf.Clamp01(
-                (distanceToCore - _env.EarthCoreRadius) / (_env.EarthAtmosphereRadius - _env.EarthCoreRadius)
+                (distanceToCore - _env.PlanetRadius) / (_env.AtmosphereRadius - _env.PlanetRadius)
             );
         }
 
         public float GetGravity(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(position, _env.EarthCorePosition);
-            var r = Mathf.Max(distanceToCore, _env.EarthCoreRadius);
-            return SurfaceGravity * (_env.EarthCoreRadius * _env.EarthCoreRadius) / (r * r);
+            var distanceToCore = Vector2.Distance(position, _env.PlanetPosition);
+            var r = Mathf.Max(distanceToCore, _env.PlanetRadius);
+            return SurfaceGravity * (_env.PlanetRadius * _env.PlanetRadius) / (r * r);
         }
 
         public float GetAirDensity(Vector2 position)
@@ -55,7 +54,7 @@ namespace Ship
             var position = _rb.position;
 
             // gravity
-            var directionToTarget = (_env.EarthCorePosition - position).normalized;
+            var directionToTarget = (_env.PlanetPosition - position).normalized;
             var gravity = directionToTarget * GetGravity(position);
 
             _rb.AddForce(gravity * _rb.mass, ForceMode2D.Force);

@@ -5,6 +5,8 @@ using System.Linq;
 using Ship;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace ML
@@ -13,8 +15,8 @@ namespace ML
     {
         private int _currentGeneration = 1;
 
-        private const int InputCount = 10;
-        private const int OutputCount = 4;
+        public const int InputCount = 10;
+        public const int OutputCount = 4;
 
         [Header("Generation parameters")] [SerializeField]
         private int[] _hiddenLayers = { 12 };
@@ -34,7 +36,10 @@ namespace ML
 
         [Header("UI")] [SerializeField] private TextMeshProUGUI _timerText;
         [SerializeField] private TextMeshProUGUI _generationText;
+        [SerializeField] private TextMeshProUGUI _fitnessText;
         [SerializeField] private TMP_InputField _speedInput;
+        [SerializeField] private Button _copyStateButton;
+        [SerializeField] private Button _pasteStateButton;
 
         private float _generationStartTime;
 
@@ -47,6 +52,8 @@ namespace ML
             _fitnessScores = new List<float>(_populationSize);
 
             _speedInput.onValueChanged.AddListener(OnSpeedValueChanged);
+            _copyStateButton.onClick.AddListener(OnCopyStateClicked);
+            _pasteStateButton.onClick.AddListener(OnPasteStateClicked);
         }
 
         private void Start()
@@ -69,6 +76,8 @@ namespace ML
                 _fitnessScores.Add(0f);
             }
 
+            UpdateFitnessUI(); // set initial text
+
             StartCoroutine(TrainingLoop());
         }
 
@@ -79,12 +88,14 @@ namespace ML
                 _speedInput.text = Time.timeScale.ToString("N0");
             }
 
+            if (Keyboard.current.digit1Key.wasPressedThisFrame) Time.timeScale = 1f;
+            if (Keyboard.current.digit2Key.wasPressedThisFrame) Time.timeScale = 2f;
+            if (Keyboard.current.digit3Key.wasPressedThisFrame) Time.timeScale = 12f;
+            if (Keyboard.current.digit4Key.wasPressedThisFrame) Time.timeScale = 60f;
+            if (Keyboard.current.digit5Key.wasPressedThisFrame) Time.timeScale = 100f;
+
             var timespan = TimeSpan.FromSeconds(Time.time - _generationStartTime);
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
-
-            var maxNumDigits = _maxGenerations.ToString().Length;
-            var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
-            _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
         }
 
         private void OnSpeedValueChanged(string input)
@@ -93,6 +104,83 @@ namespace ML
             {
                 Time.timeScale = timeScale;
             }
+        }
+
+        private void OnCopyStateClicked()
+        {
+            // copy all parameters and weights to clipboard
+            var stateStrings = new List<string>
+            {
+                _currentGeneration.ToString(),
+                _maxGenerations.ToString(),
+                _populationSize.ToString(),
+                _eliteCount.ToString(),
+                _mutationRate.ToString("F6"),
+                _mutationStrength.ToString("F6")
+            };
+
+            foreach (var ship in _population)
+            {
+                var weights = ship.Brain.GetFlatWeights();
+                var weightStrings = weights.Select(w => w.ToString("F6"));
+                stateStrings.Add(string.Join(",", weightStrings));
+            }
+
+            var fullState = string.Join("\n", stateStrings);
+            var encodedState = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fullState));
+            GUIUtility.systemCopyBuffer = encodedState;
+            Debug.Log("<color=cyan>Copied state to clipboard.</color>");
+        }
+
+        private void OnPasteStateClicked()
+        {
+            try
+            {
+                var encodedState = GUIUtility.systemCopyBuffer;
+                var fullState = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
+                var stateLines = fullState.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                _currentGeneration = int.Parse(stateLines[0]);
+                _maxGenerations = int.Parse(stateLines[1]);
+                _populationSize = int.Parse(stateLines[2]);
+                _eliteCount = int.Parse(stateLines[3]);
+                _mutationRate = float.Parse(stateLines[4]);
+                _mutationStrength = float.Parse(stateLines[5]);
+
+                for (var i = 0; i < _population.Count; i++)
+                {
+                    var weightStrings = stateLines[6 + i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var weights = weightStrings.Select(w => float.Parse(w)).ToArray();
+                    _population[i].Brain.SetFlatWeights(weights);
+                }
+
+                Debug.Log("<color=cyan>Loaded state from clipboard.</color>");
+
+                StopCoroutine(TrainingLoop());
+                StartCoroutine(TrainingLoop());
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("<color=red>Failed to load state from clipboard: " + e.Message + "</color>");
+            }
+        }
+
+        private void UpdateFitnessUI(float prevAverage = 0f, float prevMax = 0f)
+        {
+            var avgFitness = _fitnessScores.Average();
+            var maxFitness = _fitnessScores.Max();
+
+            var avgDiff = avgFitness - prevAverage;
+            var maxDiff = maxFitness - prevMax;
+            var avgDiffFmt = avgDiff >= 0 ? $"+{avgDiff:F3}" : $"{avgDiff:F3}";
+            var maxDiffFmt = maxDiff >= 0 ? $"+{maxDiff:F3}" : $"{maxDiff:F3}";
+
+            var fmt =
+                $"avg. <color=yellow>{avgFitness:F3}</color> ({avgDiffFmt}), " +
+                $"max. <color=green>{maxFitness:F3}</color> ({maxDiffFmt})";
+
+            _fitnessText.text = fmt;
+            Debug.Log(fmt);
         }
 
         private IEnumerator TrainingLoop()
@@ -105,6 +193,10 @@ namespace ML
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
                 _generationStartTime = Time.time;
 
+                var maxNumDigits = _maxGenerations.ToString().Length;
+                var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
+                _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
+
                 foreach (var ship in _population)
                 {
                     ship.Rb.MovePositionAndRotation(_spawnPosition, Quaternion.identity);
@@ -115,6 +207,9 @@ namespace ML
 
                 yield return new WaitForSeconds(_generationDuration);
 
+                var prevAverage = _fitnessScores.Average();
+                var prevMax = _fitnessScores.Max();
+
                 for (var i = 0; i < _population.Count; i++)
                 {
                     var ship = _population[i];
@@ -122,9 +217,7 @@ namespace ML
                     _fitnessScores[i] = fitness;
                 }
 
-                var maxFitness = _fitnessScores.Max();
-                var avgFitness = _fitnessScores.Average();
-                Debug.Log($"Avg. <color=cyan>{avgFitness:F2}</color>, max. <color=yellow>{maxFitness:F2}</color>");
+                UpdateFitnessUI(prevAverage, prevMax);
 
                 EvolvePopulation();
                 _currentGeneration++;
@@ -133,20 +226,38 @@ namespace ML
 
         private float EvaluateFitness(SpaceshipController ship)
         {
+            // crashed, failed
+            if (!ship.isActiveAndEnabled) return 0f;
+
             var fitness = 0f;
 
-            // crashed, failed
-            if (!ship.isActiveAndEnabled)
+            var position = ship.Rb.position;
+            var velocity = ship.Rb.linearVelocity;
+
+            var orbit = OrbitDescription.Calculate(position, velocity);
+
+            var planetRadius = Environment.Instance.PlanetRadius;
+            var atmosphereRadius = Environment.Instance.AtmosphereRadius;
+
+            var minOrbitAltitude = (atmosphereRadius - planetRadius) + 500f;
+
+            var apoapsisAltitude = orbit.Apoapsis - planetRadius;
+            var periapsisAltitude = orbit.Periapsis - planetRadius;
+
+            // reward getting apoapsis & periapsis up
+            fitness += Mathf.Clamp01(apoapsisAltitude / minOrbitAltitude);
+            fitness += Mathf.Clamp01(periapsisAltitude / minOrbitAltitude);
+
+            // immediately reward any kind of stable orbit
+            if (orbit.IsStable)
             {
-                return -1f;
+                fitness += 1f;
+
+                // bonus for more circular orbits
+                fitness += 1f - orbit.Eccentricity;
             }
 
-            // todo detect if in orbit
-            // todo detect circularity of orbit
-
-            fitness += ship.PlanetaryPhysics.GetAltitude(ship.Rb.position);
-
-            return Mathf.Max(0f, fitness);
+            return fitness;
         }
 
         private void EvolvePopulation()
