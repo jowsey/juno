@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Ship
 {
     [Serializable]
-    public class StageGroup
+    public struct StageGroup
     {
         public SpaceshipStage[] Stages;
         public bool Separated;
@@ -146,7 +146,7 @@ namespace Ship
         [ContextMenu("Force next separation")]
         public void SeparateStageGroup()
         {
-            StageGroup group = null;
+            StageGroup? group = null;
 
             if (!_boosterStageGroup.Separated)
             {
