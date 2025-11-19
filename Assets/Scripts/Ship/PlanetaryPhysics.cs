@@ -7,8 +7,6 @@ namespace Ship
     {
         public const float SurfaceGravity = 9.81f;
 
-        private static Environment _env => Environment.Instance;
-
         private Rigidbody2D _rb;
 
         [SerializeField] private float _airDensityFalloff = 5f;
@@ -23,24 +21,28 @@ namespace Ship
 
         public float GetAltitude(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(position, _env.PlanetPosition);
-            var altitude = distanceToCore - _env.PlanetRadius;
+            var env = Environment.Instance;
+            var distanceToCore = Vector2.Distance(position, env.PlanetPosition);
+            var altitude = distanceToCore - env.PlanetRadius;
             return Mathf.Max(0f, altitude);
         }
 
         public float GetAtmosphereProgress(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(position, _env.PlanetPosition);
+            var env = Environment.Instance;
+            var distanceToCore = Vector2.Distance(position, env.PlanetPosition);
             return Mathf.Clamp01(
-                (distanceToCore - _env.PlanetRadius) / (_env.AtmosphereRadius - _env.PlanetRadius)
+                (distanceToCore - env.PlanetRadius) /
+                (env.AtmosphereRadius - env.PlanetRadius)
             );
         }
 
         public float GetGravity(Vector2 position)
         {
-            var distanceToCore = Vector2.Distance(position, _env.PlanetPosition);
-            var r = Mathf.Max(distanceToCore, _env.PlanetRadius);
-            return SurfaceGravity * (_env.PlanetRadius * _env.PlanetRadius) / (r * r);
+            var env = Environment.Instance;
+            var distanceToCore = Vector2.Distance(position, env.PlanetPosition);
+            var r = Mathf.Max(distanceToCore, env.PlanetRadius);
+            return SurfaceGravity * (env.PlanetRadius * env.PlanetRadius) / (r * r);
         }
 
         public float GetAirDensity(Vector2 position)
@@ -54,7 +56,7 @@ namespace Ship
             var position = _rb.position;
 
             // gravity
-            var directionToTarget = (_env.PlanetPosition - position).normalized;
+            var directionToTarget = (Environment.Instance.PlanetPosition - position).normalized;
             var gravity = directionToTarget * GetGravity(position);
 
             _rb.AddForce(gravity * _rb.mass, ForceMode2D.Force);
