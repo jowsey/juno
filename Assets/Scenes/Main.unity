@@ -1806,8 +1806,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbff2cc13dcb4be18fb4128195cc1577, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ML.SimulationManager
-  SpeedTrainingMode: 0
-  _hiddenLayers: 09000000
+  _runGenerationLoop: 1
+  _forceRestartGeneration: 0
+  _hiddenLayers: 08000000
   _maxGenerations: 500
   _populationSize: 100
   _generationDuration: 180
@@ -1815,7 +1816,7 @@ MonoBehaviour:
   _mutationRate: 0.02
   _mutationStrength: 0.3
   _spaceshipPrefab: {fileID: 7247496989856108138, guid: e086e47e1897443f298d2392860d479a, type: 3}
-  _spawnPosition: {x: 0, y: 12.1, z: 0}
+  _spawnPosition: {x: 0, y: 12.1}
   _shipContainer: {fileID: 1911069517}
   _timerText: {fileID: 1452712751}
   _timerProgressBar: {fileID: 620336837}
