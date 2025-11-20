@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Ship;
 using TMPro;
@@ -19,7 +17,7 @@ namespace ML
         public bool SpeedTrainingMode { get; private set; }
 
         [Header("Controls")] [SerializeField] private bool _runGenerationLoop = true;
-        [SerializeField] private bool _forceRestartGeneration;
+        [SerializeField] private bool _restartGeneration = true;
 
         [Header("Generation parameters")] [SerializeField]
         private int[] _hiddenLayers = { 12 };
@@ -50,7 +48,7 @@ namespace ML
 
         private CameraController _cameraController;
 
-        private int _currentGeneration;
+        private int _currentGeneration = 1;
         private float _generationElapsedTime;
 
         private List<SpaceshipController> _population;
@@ -100,7 +98,7 @@ namespace ML
             _generationElapsedTime += Time.fixedDeltaTime;
 
             var generationComplete = _generationElapsedTime >= _generationDuration;
-            if (generationComplete && !_forceRestartGeneration)
+            if (generationComplete && !_restartGeneration)
             {
                 var prevAverage = _fitnessScores.Average();
                 var prevMax = _fitnessScores.Max();
@@ -114,13 +112,14 @@ namespace ML
 
                 UpdateFitnessUI(prevAverage, prevMax);
                 EvolvePopulation();
+
+                _currentGeneration++;
             }
 
-            if (generationComplete || _forceRestartGeneration || _currentGeneration == 0)
+            if (generationComplete || _restartGeneration)
             {
-                _currentGeneration++;
                 _generationElapsedTime = 0f;
-                _forceRestartGeneration = false;
+                _restartGeneration = false;
 
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
 
@@ -180,27 +179,28 @@ namespace ML
 
         private void OnCopyStateClicked()
         {
-            // copy all parameters and weights to clipboard
-            var parameterStrings = new List<string>
+            var lines = new List<string>();
+
+            var parameters = new[]
             {
                 _currentGeneration.ToString(),
                 _maxGenerations.ToString(),
                 _populationSize.ToString(),
                 _eliteCount.ToString(),
-                _mutationRate.ToString("F6", CultureInfo.InvariantCulture),
-                _mutationStrength.ToString("F6", CultureInfo.InvariantCulture),
+                _mutationRate.ToString("G9"),
+                _mutationStrength.ToString("G9")
             };
 
-            foreach (var ship in _population)
-            {
-                var weights = ship.Brain.GetFlatWeights();
-                var weightStrings = weights.Select(w => w.ToString("F6", CultureInfo.InvariantCulture));
-                parameterStrings.Add(string.Join(",", weightStrings));
-            }
+            lines.Add(string.Join(",", parameters));
 
-            var fullState = string.Join("\n", parameterStrings);
-            var encodedState = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fullState));
-            GUIUtility.systemCopyBuffer = encodedState;
+            lines.AddRange(
+                _population
+                    .Select(ship => ship.Brain.GetFlatWeights())
+                    .Select(weights => string.Join(",", weights.Select(w => w.ToString("G9"))))
+            );
+
+            var base64Lines = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Join("\n", lines)));
+            GUIUtility.systemCopyBuffer = base64Lines;
             Debug.Log("<color=cyan>Copied state to clipboard.</color>");
         }
 
@@ -209,38 +209,36 @@ namespace ML
             try
             {
                 var encodedState = GUIUtility.systemCopyBuffer;
-                var fullState = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
-                var stateLines = fullState.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var decodedString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
+                var lines = decodedString.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                const int numParameters = 6;
-
-                if (stateLines.Length != numParameters + _population.Count)
+                if (lines.Length != _population.Count + 1)
                 {
                     throw new Exception(
-                        "Invalid state data: incorrect number of lines. (probably different population size)"
+                        "Invalid state data: probably different population size"
                     );
                 }
 
-                _currentGeneration = int.Parse(stateLines[0]);
-                _maxGenerations = int.Parse(stateLines[1]);
-                _populationSize = int.Parse(stateLines[2]);
-                _eliteCount = int.Parse(stateLines[3]);
-                _mutationRate = float.Parse(stateLines[4], CultureInfo.InvariantCulture);
-                _mutationStrength = float.Parse(stateLines[5], CultureInfo.InvariantCulture);
+                var parameters = lines[0].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                _currentGeneration = int.Parse(parameters[0]);
+                _maxGenerations = int.Parse(parameters[1]);
+                _populationSize = int.Parse(parameters[2]);
+                _eliteCount = int.Parse(parameters[3]);
+                _mutationRate = float.Parse(parameters[4]);
+                _mutationStrength = float.Parse(parameters[5]);
 
                 for (var i = 0; i < _population.Count; i++)
                 {
-                    var weightStrings = stateLines[numParameters + i].Split(
-                        new[] { ',' },
-                        StringSplitOptions.RemoveEmptyEntries
-                    );
-                    var weights = weightStrings.Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                    var weightStrings = lines[i + 1].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var weights = weightStrings.Select(float.Parse).ToArray();
+
                     _population[i].Brain.SetFlatWeights(weights);
                     _fitnessScores[i] = 0f;
                 }
 
                 UpdateFitnessUI();
-                _forceRestartGeneration = true;
+                _restartGeneration = true;
 
                 Debug.Log("<color=green>Loaded state from clipboard.</color>");
             }

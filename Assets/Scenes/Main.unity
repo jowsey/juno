@@ -1807,8 +1807,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ML.SimulationManager
   _runGenerationLoop: 1
-  _forceRestartGeneration: 0
-  _hiddenLayers: 08000000
+  _restartGeneration: 1
+  _hiddenLayers: 01000000
   _maxGenerations: 500
   _populationSize: 100
   _generationDuration: 180
@@ -2947,7 +2947,7 @@ MonoBehaviour:
   _localFollowOffset: {x: 0, y: -3, z: 0}
   _zoomRelativeMoveSpeed: 2
   _minZoom: 5
-  _maxZoom: 2000
+  _maxZoom: 4500
   _zoomSpeedLog: 1.1
   _baseZoomSpeed: 0.4
   FollowTarget: {fileID: 0}
