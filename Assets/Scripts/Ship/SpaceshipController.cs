@@ -55,12 +55,14 @@ namespace Ship
         [HideInInspector] public PlanetaryPhysics PlanetaryPhysics;
 
         public NeuralNetwork Brain;
+        private float[] _inputs;
+
+        public const int InputCount = 11;
+        public const int OutputCount = 4;
 
         private SpaceshipStage _topLevelStage;
         [SerializeField] private StageGroup _boosterStageGroup;
         [SerializeField] private StageGroup _heavyStageGroup;
-
-        private float[] _inputs;
 
         [HideInInspector] public float HighestAtmosphereProgress;
 
@@ -72,43 +74,73 @@ namespace Ship
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
-            _inputs = new float[SimulationManager.InputCount];
+            _inputs = new float[InputCount];
         }
 
-        private static float NormalizeRotation(float rotation)
+        [ContextMenu("Print inputs")]
+        private void PrintInputs()
         {
-            rotation %= 360f;
-            if (rotation > 180f) rotation -= 360f;
-            return rotation / 180f;
+            string[] inputLabels =
+            {
+                "Atmosphere Progress",
+                "Velocity X",
+                "Velocity Y",
+                "Angular Velocity",
+                "Rotation sin",
+                "Rotation cos",
+                "Top Level Fuel",
+                "Heavy Stage Fuel",
+                "Booster Stage Fuel",
+                "Heavy Stage Separated",
+                "Booster Stage Separated"
+            };
+
+            for (var i = 0; i < _inputs.Length; i++)
+            {
+                Debug.Log($"{inputLabels[i]}: {_inputs[i]}");
+            }
         }
 
         private void FixedUpdate()
         {
             if (Brain == null || !_useBrain) return;
 
-            var atmosphereProgress = PlanetaryPhysics.GetAtmosphereProgress(Rb.position);
+            var pos = Rb.position;
+            var linearVelocity = Rb.linearVelocity;
+
+            var atmosphereProgress = PlanetaryPhysics.GetAtmosphereProgress(pos);
             if (atmosphereProgress > HighestAtmosphereProgress)
             {
                 HighestAtmosphereProgress = atmosphereProgress;
             }
 
+            var upDir = (pos - Environment.Instance.PlanetPosition).normalized;
+            var tangentDir = new Vector2(upDir.y, -upDir.x);
+
+            var relativeVelocityY = Vector2.Dot(linearVelocity, upDir);
+            var relativeVelocityX = Vector2.Dot(linearVelocity, tangentDir);
+
+            var surfaceAngle = Mathf.Atan2(upDir.y, upDir.x) * Mathf.Rad2Deg - 90f;
+            var relativeRotation = Mathf.DeltaAngle(surfaceAngle, Rb.rotation);
+
             _inputs[0] = atmosphereProgress;
-            _inputs[1] = Rb.linearVelocity.x / 1000f;
-            _inputs[2] = Rb.linearVelocity.y / 1000f;
-            _inputs[3] = Mathf.Clamp(Rb.angularVelocity / SpaceshipStage.AngularVelocityExplodeThreshold, -1, 1);
-            _inputs[4] = NormalizeRotation(Rb.rotation);
-            _inputs[5] = _topLevelStage.GetFuelRemaining();
-            _inputs[6] = _heavyStageGroup.Separated ? 0f : _heavyStageGroup.GetAverageFuelRemaining();
-            _inputs[7] = _boosterStageGroup.Separated ? 0f : _boosterStageGroup.GetAverageFuelRemaining();
-            _inputs[8] = _heavyStageGroup.Separated ? 1f : -1f;
-            _inputs[9] = _boosterStageGroup.Separated ? 1f : -1f;
+            _inputs[1] = (float)Math.Tanh(relativeVelocityX / 500f);
+            _inputs[2] = (float)Math.Tanh(relativeVelocityY / 500f);
+            _inputs[3] = (float)Math.Tanh(Rb.angularVelocity / 45f);
+            _inputs[4] = Mathf.Sin(relativeRotation * Mathf.Deg2Rad);
+            _inputs[5] = Mathf.Cos(relativeRotation * Mathf.Deg2Rad);
+            _inputs[6] = _topLevelStage.GetFuelRemaining();
+            _inputs[7] = !_heavyStageGroup.Separated ? _heavyStageGroup.GetAverageFuelRemaining() : 0;
+            _inputs[8] = !_boosterStageGroup.Separated ? _boosterStageGroup.GetAverageFuelRemaining() : 0;
+            _inputs[9] = _heavyStageGroup.Separated ? 1 : 0;
+            _inputs[10] = _boosterStageGroup.Separated ? 1 : 0;
 
             var outputs = Brain.FeedForward(_inputs);
 
-            var thrustControl = Mathf.Clamp01(outputs[0] * 0.5f + 0.5f);
-            var steeringControl = Mathf.Clamp(outputs[1], -1f, 1f);
-            var separateBoosterStage = outputs[2] > 0f;
-            var separateHeavyStage = outputs[3] > 0f;
+            var thrustControl = outputs[0] * 0.5f + 0.5f;
+            var steeringControl = outputs[1];
+            var separateBoosterStage = outputs[2] > 0.5f;
+            var separateHeavyStage = outputs[3] > 0.5f;
 
             if (separateBoosterStage && !_boosterStageGroup.Separated && !_heavyStageGroup.Separated)
             {

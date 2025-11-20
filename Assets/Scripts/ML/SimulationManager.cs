@@ -16,12 +16,10 @@ namespace ML
     {
         public static SimulationManager Instance { get; private set; }
 
-        public bool SpeedTrainingMode;
+        public bool SpeedTrainingMode { get; private set; }
 
-        private int _currentGeneration;
-
-        public const int InputCount = 10;
-        public const int OutputCount = 4;
+        [Header("Controls")] [SerializeField] private bool _runGenerationLoop = true;
+        [SerializeField] private bool _forceRestartGeneration;
 
         [Header("Generation parameters")] [SerializeField]
         private int[] _hiddenLayers = { 12 };
@@ -32,11 +30,12 @@ namespace ML
         [SerializeField] private float _generationDuration = 90f;
 
         [SerializeField] private int _eliteCount = 5;
+
         [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
         [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.1f;
 
         [Header("Ship")] [SerializeField] private SpaceshipController _spaceshipPrefab;
-        [SerializeField] private Vector3 _spawnPosition;
+        [SerializeField] private Vector2 _spawnPosition;
         [SerializeField] private Transform _shipContainer;
 
         [Header("UI")] [SerializeField] private TextMeshProUGUI _timerText;
@@ -51,7 +50,8 @@ namespace ML
 
         private CameraController _cameraController;
 
-        private float _generationStartTime;
+        private int _currentGeneration;
+        private float _generationElapsedTime;
 
         private List<SpaceshipController> _population;
         private List<float> _fitnessScores;
@@ -74,9 +74,9 @@ namespace ML
         private void Start()
         {
             var networkShape = new int[_hiddenLayers.Length + 2];
-            networkShape[0] = InputCount; // inputs
+            networkShape[0] = SpaceshipController.InputCount; // inputs
             Array.Copy(_hiddenLayers, 0, networkShape, 1, _hiddenLayers.Length);
-            networkShape[^1] = OutputCount; // outputs
+            networkShape[^1] = SpaceshipController.OutputCount; // outputs
 
             Debug.Log("Creating brains with shape " + string.Join("-", networkShape));
 
@@ -91,10 +91,53 @@ namespace ML
                 _fitnessScores.Add(0f);
             }
 
-            UpdateFitnessUI(); // set initial text
-
-            StartCoroutine(TrainingLoop());
+            UpdateFitnessUI();
         }
+
+        private void FixedUpdate()
+        {
+            if (!_runGenerationLoop) return;
+            _generationElapsedTime += Time.fixedDeltaTime;
+
+            var generationComplete = _generationElapsedTime >= _generationDuration;
+            if (generationComplete && !_forceRestartGeneration)
+            {
+                var prevAverage = _fitnessScores.Average();
+                var prevMax = _fitnessScores.Max();
+
+                for (var i = 0; i < _population.Count; i++)
+                {
+                    var ship = _population[i];
+                    var fitness = EvaluateFitness(ship);
+                    _fitnessScores[i] = fitness;
+                }
+
+                UpdateFitnessUI(prevAverage, prevMax);
+                EvolvePopulation();
+            }
+
+            if (generationComplete || _forceRestartGeneration || _currentGeneration == 0)
+            {
+                _currentGeneration++;
+                _generationElapsedTime = 0f;
+                _forceRestartGeneration = false;
+
+                Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
+
+                var maxNumDigits = _maxGenerations.ToString().Length;
+                var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
+                _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
+
+                foreach (var ship in _population)
+                {
+                    ship.Rb.MovePositionAndRotation(_spawnPosition, Quaternion.identity);
+                    ship.Reinitialise();
+                }
+
+                Physics2D.SyncTransforms();
+            }
+        }
+
 
         private void LateUpdate()
         {
@@ -111,10 +154,10 @@ namespace ML
                 _speedInput.text = Time.timeScale.ToString("N0");
             }
 
-            var timespan = TimeSpan.FromSeconds(Time.time - _generationStartTime);
+            var timespan = TimeSpan.FromSeconds(_generationElapsedTime);
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
 
-            var progress = Mathf.Clamp01((Time.time - _generationStartTime) / _generationDuration);
+            var progress = Mathf.Clamp01(_generationElapsedTime / _generationDuration);
             if (_currentGeneration % 2 == 0)
             {
                 _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Right;
@@ -138,7 +181,7 @@ namespace ML
         private void OnCopyStateClicked()
         {
             // copy all parameters and weights to clipboard
-            var stateStrings = new List<string>
+            var parameterStrings = new List<string>
             {
                 _currentGeneration.ToString(),
                 _maxGenerations.ToString(),
@@ -152,10 +195,10 @@ namespace ML
             {
                 var weights = ship.Brain.GetFlatWeights();
                 var weightStrings = weights.Select(w => w.ToString("F6", CultureInfo.InvariantCulture));
-                stateStrings.Add(string.Join(",", weightStrings));
+                parameterStrings.Add(string.Join(",", weightStrings));
             }
 
-            var fullState = string.Join("\n", stateStrings);
+            var fullState = string.Join("\n", parameterStrings);
             var encodedState = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fullState));
             GUIUtility.systemCopyBuffer = encodedState;
             Debug.Log("<color=cyan>Copied state to clipboard.</color>");
@@ -173,7 +216,9 @@ namespace ML
 
                 if (stateLines.Length != numParameters + _population.Count)
                 {
-                    throw new Exception("Invalid state data: incorrect number of lines. (probably different population size)");
+                    throw new Exception(
+                        "Invalid state data: incorrect number of lines. (probably different population size)"
+                    );
                 }
 
                 _currentGeneration = int.Parse(stateLines[0]);
@@ -185,16 +230,19 @@ namespace ML
 
                 for (var i = 0; i < _population.Count; i++)
                 {
-                    var weightStrings = stateLines[numParameters + i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var weightStrings = stateLines[numParameters + i].Split(
+                        new[] { ',' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    );
                     var weights = weightStrings.Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
                     _population[i].Brain.SetFlatWeights(weights);
                     _fitnessScores[i] = 0f;
                 }
 
-                Debug.Log("<color=green>Loaded state from clipboard.</color>");
+                UpdateFitnessUI();
+                _forceRestartGeneration = true;
 
-                StopCoroutine(TrainingLoop());
-                StartCoroutine(TrainingLoop());
+                Debug.Log("<color=green>Loaded state from clipboard.</color>");
             }
             catch (Exception e)
             {
@@ -212,16 +260,12 @@ namespace ML
                 return;
             }
 
-            var bestIndex = _fitnessScores
-                .Select((fitness, index) => new { fitness, index })
-                .OrderByDescending(x => x.fitness)
-                .First().index;
-
-            var bestShip = _population[bestIndex];
+            // elitism means first _eliteCount items will be sorted best
+            var bestShip = _population[0];
 
             _cameraController.FollowTarget = bestShip.transform;
             _viewBestButtonText.text = "Stop viewing";
-            Debug.Log($"Following best ship with fitness of {_fitnessScores[bestIndex]:F3}).");
+            Debug.Log($"Following best ship with fitness of {_fitnessScores[0]:F3}).");
         }
 
         private void UpdateFitnessUI(float prevAverage = 0f, float prevMax = 0f)
@@ -242,45 +286,6 @@ namespace ML
             Debug.Log(fmt);
         }
 
-        private IEnumerator TrainingLoop()
-        {
-            while (_currentGeneration < _maxGenerations)
-            {
-                _currentGeneration++;
-
-                Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
-                _generationStartTime = Time.time;
-
-                var maxNumDigits = _maxGenerations.ToString().Length;
-                var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
-                _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
-
-                foreach (var ship in _population)
-                {
-                    ship.Rb.MovePositionAndRotation(_spawnPosition, Quaternion.identity);
-                    ship.Reinitialise();
-                }
-
-                Physics2D.SyncTransforms();
-
-                yield return new WaitForSeconds(_generationDuration);
-
-                var prevAverage = _fitnessScores.Average();
-                var prevMax = _fitnessScores.Max();
-
-                for (var i = 0; i < _population.Count; i++)
-                {
-                    var ship = _population[i];
-                    var fitness = EvaluateFitness(ship);
-                    _fitnessScores[i] = fitness;
-                }
-
-                UpdateFitnessUI(prevAverage, prevMax);
-
-                EvolvePopulation();
-            }
-        }
-
         private float EvaluateFitness(SpaceshipController ship)
         {
             var fitness = 0f;
@@ -290,14 +295,26 @@ namespace ML
 
             var orbit = OrbitDescription.Calculate(position, velocity);
 
-            var planetRadius = Environment.Instance.PlanetRadius;
-            var atmosphereRadius = Environment.Instance.AtmosphereRadius;
+            var env = Environment.Instance;
 
+            // var planetRadius = env.PlanetRadius;
+            var atmosphereRadius = env.AtmosphereRadius;
             var goalOrbitAltitude = atmosphereRadius + 500f;
+
             // var apoapsisProgress = (orbit.Apoapsis - planetRadius) / (goalOrbitAltitude - planetRadius);
             var periapsisProgress = orbit.Periapsis / goalOrbitAltitude;
 
-            fitness += ship.HighestAtmosphereProgress * 0.01f; // 0 - 0.01 to nudge off ground
+            // tiny reward for getting higher up to nudge off the ground
+            fitness += ship.HighestAtmosphereProgress * 0.01f;
+
+            var planetPos = env.PlanetPosition.normalized;
+            var angle = Vector2.Angle(
+                _spawnPosition.normalized - planetPos,
+                position.normalized - planetPos
+            );
+
+            // another tiny reward for going further around the planet
+            fitness += Mathf.Clamp01(angle / 180f) * 0.01f;
 
             // reward for higher periapsis
             fitness += periapsisProgress;
@@ -316,27 +333,31 @@ namespace ML
 
         private void EvolvePopulation()
         {
-            var sortedIndices = _fitnessScores
-                .Select((fitness, index) => new { fitness, index })
+            var sortedPop = _population
+                .Zip(_fitnessScores, (ship, fitness) => new { ship, fitness })
                 .OrderByDescending(x => x.fitness)
-                .Select(x => x.index)
-                .ToArray();
+                .ToList();
 
             var newBrains = new List<NeuralNetwork>(_populationSize);
 
             // keep best performers
             for (var i = 0; i < _eliteCount; i++)
             {
-                newBrains.Add(new NeuralNetwork(_population[sortedIndices[i]].Brain));
+                newBrains.Add(new NeuralNetwork(sortedPop[i].ship.Brain));
             }
 
             while (newBrains.Count < _populationSize)
             {
-                var parent1 = TournamentSelect(5);
-                var parent2 = TournamentSelect(5);
-                var childBrain = new NeuralNetwork(parent1, parent2);
+                // crossover
+                // var parent1 = TournamentSelect(5);
+                // var parent2 = TournamentSelect(5);
+                // var childBrain = new NeuralNetwork(parent1, parent2);
 
-                var weights = childBrain.GetFlatWeights();
+                // asexual
+                var parent = TournamentSelect(5);
+                var newBrain = new NeuralNetwork(parent);
+
+                var weights = newBrain.GetFlatWeights();
                 for (var i = 0; i < weights.Length; i++)
                 {
                     if (Random.value < _mutationRate)
@@ -345,13 +366,14 @@ namespace ML
                     }
                 }
 
-                childBrain.SetFlatWeights(weights);
-                newBrains.Add(childBrain);
+                newBrain.SetFlatWeights(weights);
+                newBrains.Add(newBrain);
             }
 
             for (var i = 0; i < _population.Count; i++)
             {
                 _population[i].Brain = newBrains[i];
+                _fitnessScores[i] = sortedPop[i].fitness; // keep fitness scores aligned with population
             }
         }
 
