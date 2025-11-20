@@ -1,4 +1,3 @@
-using System;
 using ML;
 using UnityEngine;
 
@@ -28,10 +27,8 @@ namespace Ship
 
         private float _cachedParticleRatio;
 
-        private new void Awake()
+        private void Awake()
         {
-            base.Awake();
-
             _initialParticleRateOverTime = _flameParticles.emission.rateOverTime.constant;
 
             var emission = _flameParticles.emission;
