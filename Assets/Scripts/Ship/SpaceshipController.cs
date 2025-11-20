@@ -118,6 +118,7 @@ namespace Ship
             if (separateHeavyStage && !_heavyStageGroup.Separated)
             {
                 _heavyStageGroup.Separate();
+                _boosterStageGroup.Separated = true;
             }
 
             if (!_boosterStageGroup.Separated)
