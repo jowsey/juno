@@ -11,7 +11,7 @@ namespace Ship
 
         [SerializeField] private float _airDensityFalloff = 5f;
         [SerializeField] private float _dragCoefficient = 20f;
-        [SerializeField] private float _angularDamping = 4f;
+        [SerializeField] private float _angularDamping = 1.5f;
 
         private void Awake()
         {
