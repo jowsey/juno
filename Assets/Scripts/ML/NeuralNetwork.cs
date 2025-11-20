@@ -30,19 +30,8 @@ namespace ML
             InitNeurons();
             InitWeights(false);
 
-            // deep copy weights and biases
-            for (var i = 0; i < other._weights.Length; i++)
-            {
-                for (var j = 0; j < other._weights[i].Length; j++)
-                {
-                    _weights[i][j] = other._weights[i][j].Clone() as float[];
-                }
-            }
-
-            for (var i = 0; i < other._biases.Length; i++)
-            {
-                _biases[i] = other._biases[i].Clone() as float[];
-            }
+            var otherGenes = other.GetFlatWeights();
+            SetFlatWeights(otherGenes);
         }
 
         // crossover between two parents to create a child
