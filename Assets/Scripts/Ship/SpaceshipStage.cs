@@ -27,7 +27,7 @@ namespace Ship
 
         public const float RelativeSeparationForce = 2f;
 
-        public const float CrashVelocityThreshold = 3.5f;
+        public const float CrashVelocityThreshold = 5f;
         public const float AngularVelocityExplodeThreshold = 1800f;
 
         [SerializeField] private bool _fixCenterOfMass = true;
@@ -262,8 +262,7 @@ namespace Ship
 
             SetThrustControl(0f);
 
-            var inheritedLinearVelocity = Rb.linearVelocity;
-            var inheritedAngularVelocity = Rb.angularVelocity;
+            var parentRb = Rb;
 
             // detach from parent and tell it to rescan parts (we took some with us)
             transform.SetParent(Ship.transform.parent);
@@ -271,12 +270,12 @@ namespace Ship
 
             // become our own physics object
             Rb = gameObject.AddComponent<Rigidbody2D>();
-            Rb.linearVelocity = inheritedLinearVelocity;
-            Rb.angularVelocity = inheritedAngularVelocity;
+            Rb.linearVelocity = parentRb.linearVelocity;
+            Rb.angularVelocity = parentRb.angularVelocity;
             Rb.linearDamping = 0f;
             Rb.angularDamping = 0f;
-            Rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
-            Rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            Rb.sleepMode = parentRb.sleepMode;
+            Rb.collisionDetectionMode = parentRb.collisionDetectionMode;
 
             RecalculateLinkedMass();
 
