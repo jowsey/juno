@@ -23,6 +23,7 @@ namespace Ship
         private Transform _originalParent;
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
+        private Vector3 _originalLocalScale;
 
         public const float RelativeSeparationForce = 2f;
 
@@ -52,7 +53,6 @@ namespace Ship
             Ship = GetComponentInParent<SpaceshipController>();
             if (transform.parent) _parentStage = transform.parent.GetComponentInParent<SpaceshipStage>();
 
-
             // detach from parent when it explodes
             if (_parentStage) _parentStage._onExplode.AddListener(OnParentExplode);
 
@@ -61,6 +61,7 @@ namespace Ship
             _originalParent = transform.parent;
             _originalLocalPosition = transform.localPosition;
             _originalLocalRotation = transform.localRotation;
+            _originalLocalScale = transform.localScale;
 
             RescanParts();
         }
@@ -347,6 +348,7 @@ namespace Ship
             {
                 transform.parent = _originalParent;
                 transform.SetLocalPositionAndRotation(_originalLocalPosition, _originalLocalRotation);
+                transform.localScale = _originalLocalScale;
             }
 
             RescanParts();
