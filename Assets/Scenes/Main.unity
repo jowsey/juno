@@ -1809,6 +1809,7 @@ MonoBehaviour:
   _runGenerationLoop: 1
   _restartGeneration: 1
   _hiddenLayers: 01000000
+  <UseOutputsAsInput>k__BackingField: 1
   _maxGenerations: 500
   _populationSize: 100
   _generationDuration: 180

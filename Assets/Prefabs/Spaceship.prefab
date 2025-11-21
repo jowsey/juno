@@ -353,9 +353,9 @@ GameObject:
   - component: {fileID: 4897214614216629070}
   - component: {fileID: 3253933186027625722}
   - component: {fileID: 1554720688393621409}
+  - component: {fileID: 710132882649918085}
   - component: {fileID: 8494693456446313500}
   - component: {fileID: 7247496989856108138}
-  - component: {fileID: 710132882649918085}
   - component: {fileID: 1083237447916173707}
   m_Layer: 7
   m_Name: Spaceship
@@ -463,6 +463,21 @@ Rigidbody2D:
   m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &710132882649918085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3815567468448094955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1b6bc69e0b484ca60675bc4e743068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ship.PlanetaryPhysics
+  _airDensityFalloff: 5
+  _dragCoefficient: 20
+  _angularDamping: 1
 --- !u!114 &8494693456446313500
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,7 +507,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spaceship
   _useBrain: 1
-  PlanetaryPhysics: {fileID: 0}
+  <Rb>k__BackingField: {fileID: 1554720688393621409}
+  PlanetaryPhysics: {fileID: 710132882649918085}
   _boosterStageGroup:
     Stages:
     - {fileID: 8509284842110399341}
@@ -503,21 +519,6 @@ MonoBehaviour:
     - {fileID: 343122713911733459}
     Separated: 0
   HighestAtmosphereProgress: 0
---- !u!114 &710132882649918085
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3815567468448094955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b1b6bc69e0b484ca60675bc4e743068, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ship.PlanetaryPhysics
-  _airDensityFalloff: 5
-  _dragCoefficient: 20
-  _angularDamping: 1
 --- !u!210 &1083237447916173707
 SortingGroup:
   m_ObjectHideFlags: 0

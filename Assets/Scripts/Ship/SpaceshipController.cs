@@ -50,9 +50,11 @@ namespace Ship
     {
         [SerializeField] private bool _useBrain = true;
 
+        [Header("Components")]
+        [field: SerializeField]
         public Rigidbody2D Rb { get; private set; }
 
-        [HideInInspector] public PlanetaryPhysics PlanetaryPhysics;
+        public PlanetaryPhysics PlanetaryPhysics;
 
         public NeuralNetwork Brain;
         private float[] _inputs;
@@ -62,7 +64,7 @@ namespace Ship
 
         private float[] _lastOutputs;
 
-        private SpaceshipStage _topLevelStage;
+        [Header("Stages")] private SpaceshipStage _topLevelStage;
         [SerializeField] private StageGroup _boosterStageGroup;
         [SerializeField] private StageGroup _heavyStageGroup;
 
@@ -70,9 +72,6 @@ namespace Ship
 
         private void Awake()
         {
-            Rb = GetComponent<Rigidbody2D>();
-            PlanetaryPhysics = GetComponent<PlanetaryPhysics>();
-
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
@@ -111,7 +110,7 @@ namespace Ship
         private void FixedUpdate()
         {
             if (Brain == null || !_useBrain) return;
-
+            
             var pos = Rb.position;
             var linearVelocity = Rb.linearVelocity;
 
@@ -147,12 +146,14 @@ namespace Ship
                 Array.Copy(_lastOutputs, 0, _inputs, InputCount, OutputCount);
             }
 
-            _lastOutputs = Brain.FeedForward(_inputs);
+            var outputs = Brain.FeedForward(_inputs);
 
-            var thrustControl = _lastOutputs[0] * 0.5f + 0.5f;
-            var steeringControl = _lastOutputs[1];
-            var separateBoosterStage = _lastOutputs[2] > 0.5f;
-            var separateHeavyStage = _lastOutputs[3] > 0.5f;
+            var thrustControl = outputs[0] * 0.5f + 0.5f;
+            var steeringControl = outputs[1];
+            var separateBoosterStage = outputs[2] > 0.5f;
+            var separateHeavyStage = outputs[3] > 0.5f;
+
+            Array.Copy(outputs, _lastOutputs, OutputCount);
 
             if (separateBoosterStage && !_boosterStageGroup.Separated && !_heavyStageGroup.Separated)
             {
@@ -202,6 +203,9 @@ namespace Ship
 
         public void Reinitialise()
         {
+            Array.Clear(_inputs, 0, _inputs.Length);
+            Array.Clear(_lastOutputs, 0, _lastOutputs.Length);
+            
             HighestAtmosphereProgress = 0f;
 
             Rb.linearVelocity = Vector2.zero;

@@ -113,6 +113,16 @@ namespace ML
                     _fitnessScores[i] = fitness;
                 }
 
+                var newMax = _fitnessScores.Max();
+
+                if (newMax < prevMax)
+                {
+                    Debug.LogWarning(
+                        "<color=orange>Max fitness dropped - determinism broken?</color> " +
+                        $"<color=green>{prevMax:G9}</color> -> <color=red>{newMax:G9}</color>"
+                    );
+                }
+
                 UpdateFitnessUI(prevAverage, prevMax);
                 EvolvePopulation();
 
@@ -132,7 +142,7 @@ namespace ML
 
                 foreach (var ship in _population)
                 {
-                    ship.Rb.MovePositionAndRotation(_spawnPosition, Quaternion.identity);
+                    ship.transform.SetPositionAndRotation(_spawnPosition, Quaternion.identity);
                     ship.Reinitialise();
                 }
 

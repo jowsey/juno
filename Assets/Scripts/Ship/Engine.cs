@@ -37,6 +37,7 @@ namespace Ship
 
         private void LateUpdate()
         {
+            // todo see if this is as slow as it looks, maybe cache activeSelf
             switch (SimulationManager.Instance.SpeedTrainingMode)
             {
                 case true when _flameParticles.gameObject.activeSelf:

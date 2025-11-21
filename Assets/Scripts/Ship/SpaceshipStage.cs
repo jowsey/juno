@@ -52,6 +52,7 @@ namespace Ship
             Ship = GetComponentInParent<SpaceshipController>();
             if (transform.parent) _parentStage = transform.parent.GetComponentInParent<SpaceshipStage>();
 
+
             // detach from parent when it explodes
             if (_parentStage) _parentStage._onExplode.AddListener(OnParentExplode);
 
@@ -62,14 +63,6 @@ namespace Ship
             _originalLocalRotation = transform.localRotation;
 
             RescanParts();
-        }
-
-        private void Start()
-        {
-            if (IsRootStage && _fixCenterOfMass && Rb.centerOfMass.x != 0f)
-            {
-                FixCenterOfMass();
-            }
         }
 
         private void OnParentExplode()
@@ -333,8 +326,8 @@ namespace Ship
             // if we were separated, reattach to ship
             if (IsRootStage && _parentStage)
             {
-                Destroy(GetComponent<PlanetaryPhysics>());
-                Destroy(Rb);
+                DestroyImmediate(GetComponent<PlanetaryPhysics>());
+                DestroyImmediate(Rb);
 
                 Rb = Ship.Rb;
                 IsRootStage = false;
@@ -350,10 +343,18 @@ namespace Ship
 
             if (_fairing) _fairing.SetActive(true);
 
-            if (_originalParent) transform.parent = _originalParent;
-            transform.SetLocalPositionAndRotation(_originalLocalPosition, _originalLocalRotation);
+            if (_originalParent)
+            {
+                transform.parent = _originalParent;
+                transform.SetLocalPositionAndRotation(_originalLocalPosition, _originalLocalRotation);
+            }
 
             RescanParts();
+
+            if (IsRootStage && _fixCenterOfMass && Rb.centerOfMass.x != 0f)
+            {
+                FixCenterOfMass();
+            }
         }
     }
 }
