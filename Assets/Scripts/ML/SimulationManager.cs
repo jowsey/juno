@@ -23,10 +23,9 @@ namespace ML
         private int[] _hiddenLayers = { 12 };
 
         [SerializeField] private int _maxGenerations = 100;
-
-        [SerializeField] private int _populationSize = 100;
         [SerializeField] private float _generationDuration = 90f;
 
+        [SerializeField] private int _populationSize = 100;
         [SerializeField] private int _eliteCount = 5;
 
         [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
@@ -185,6 +184,7 @@ namespace ML
             {
                 _currentGeneration.ToString(),
                 _maxGenerations.ToString(),
+                _generationDuration.ToString("G9"),
                 _populationSize.ToString(),
                 _eliteCount.ToString(),
                 _mutationRate.ToString("G9"),
@@ -223,10 +223,11 @@ namespace ML
 
                 _currentGeneration = int.Parse(parameters[0]);
                 _maxGenerations = int.Parse(parameters[1]);
-                _populationSize = int.Parse(parameters[2]);
-                _eliteCount = int.Parse(parameters[3]);
-                _mutationRate = float.Parse(parameters[4]);
-                _mutationStrength = float.Parse(parameters[5]);
+                _generationDuration = float.Parse(parameters[2]);
+                _populationSize = int.Parse(parameters[3]);
+                _eliteCount = int.Parse(parameters[4]);
+                _mutationRate = float.Parse(parameters[5]);
+                _mutationStrength = float.Parse(parameters[6]);
 
                 for (var i = 0; i < _population.Count; i++)
                 {
