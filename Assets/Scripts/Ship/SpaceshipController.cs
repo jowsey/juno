@@ -210,6 +210,7 @@ namespace Ship
 
             Rb.linearVelocity = Vector2.zero;
             Rb.angularVelocity = 0f;
+            Rb.angularDamping = 0f;
 
             gameObject.SetActive(true);
 

@@ -345,14 +345,14 @@ namespace Ship
 
             if (_originalParent)
             {
-                transform.parent = _originalParent;
+                transform.SetParent(_originalParent, false);
                 transform.SetLocalPositionAndRotation(_originalLocalPosition, _originalLocalRotation);
                 transform.localScale = _originalLocalScale;
             }
 
             RescanParts();
 
-            if (IsRootStage && _fixCenterOfMass && Rb.centerOfMass.x != 0f)
+            if (IsRootStage && _fixCenterOfMass)
             {
                 FixCenterOfMass();
             }
