@@ -110,7 +110,7 @@ namespace Ship
         private void FixedUpdate()
         {
             if (Brain == null || !_useBrain) return;
-            
+
             var pos = Rb.position;
             var linearVelocity = Rb.linearVelocity;
 
@@ -185,27 +185,23 @@ namespace Ship
         }
 
         [ContextMenu("Force next separation")]
-        public void SeparateStageGroup()
+        public void ForceNextSeparation()
         {
-            StageGroup? group = null;
-
             if (!_boosterStageGroup.Separated)
             {
-                group = _boosterStageGroup;
+                _boosterStageGroup.Separate();
             }
             else if (!_heavyStageGroup.Separated)
             {
-                group = _heavyStageGroup;
+                _heavyStageGroup.Separate();
             }
-
-            group?.Separate();
         }
 
         public void Reinitialise()
         {
             Array.Clear(_inputs, 0, _inputs.Length);
             Array.Clear(_lastOutputs, 0, _lastOutputs.Length);
-            
+
             HighestAtmosphereProgress = 0f;
 
             Rb.linearVelocity = Vector2.zero;
