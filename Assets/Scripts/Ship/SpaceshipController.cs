@@ -60,6 +60,8 @@ namespace Ship
         public const int InputCount = 11;
         public const int OutputCount = 4;
 
+        private float[] _lastOutputs;
+
         private SpaceshipStage _topLevelStage;
         [SerializeField] private StageGroup _boosterStageGroup;
         [SerializeField] private StageGroup _heavyStageGroup;
@@ -74,7 +76,8 @@ namespace Ship
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
-            _inputs = new float[InputCount];
+            _inputs = new float[InputCount + (SimulationManager.Instance.UseOutputsAsInput ? OutputCount : 0)];
+            _lastOutputs = new float[OutputCount];
         }
 
         [ContextMenu("Print inputs")]
@@ -82,17 +85,21 @@ namespace Ship
         {
             string[] inputLabels =
             {
-                "Atmosphere Progress",
+                "Atmosphere progress",
                 "Velocity X",
                 "Velocity Y",
-                "Angular Velocity",
+                "Angular velocity",
                 "Rotation sin",
                 "Rotation cos",
-                "Top Level Fuel",
-                "Heavy Stage Fuel",
-                "Booster Stage Fuel",
-                "Heavy Stage Separated",
-                "Booster Stage Separated"
+                "Top level fuel",
+                "Heavy stage fuel",
+                "Booster stage fuel",
+                "Heavy stage separated",
+                "Booster stage separated",
+                "Last thrust output",
+                "Last steering output",
+                "Last separate booster output",
+                "Last separate heavy output"
             };
 
             for (var i = 0; i < _inputs.Length; i++)
@@ -135,12 +142,17 @@ namespace Ship
             _inputs[9] = _heavyStageGroup.Separated ? 1 : 0;
             _inputs[10] = _boosterStageGroup.Separated ? 1 : 0;
 
-            var outputs = Brain.FeedForward(_inputs);
+            if (SimulationManager.Instance.UseOutputsAsInput)
+            {
+                Array.Copy(_lastOutputs, 0, _inputs, InputCount, OutputCount);
+            }
 
-            var thrustControl = outputs[0] * 0.5f + 0.5f;
-            var steeringControl = outputs[1];
-            var separateBoosterStage = outputs[2] > 0.5f;
-            var separateHeavyStage = outputs[3] > 0.5f;
+            _lastOutputs = Brain.FeedForward(_inputs);
+
+            var thrustControl = _lastOutputs[0] * 0.5f + 0.5f;
+            var steeringControl = _lastOutputs[1];
+            var separateBoosterStage = _lastOutputs[2] > 0.5f;
+            var separateHeavyStage = _lastOutputs[3] > 0.5f;
 
             if (separateBoosterStage && !_boosterStageGroup.Separated && !_heavyStageGroup.Separated)
             {

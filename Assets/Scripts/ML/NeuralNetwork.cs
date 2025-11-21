@@ -18,8 +18,8 @@ namespace ML
             _layers = new int[layers.Length];
             Array.Copy(layers, _layers, layers.Length);
 
-            InitNeurons();
-            InitWeights();
+            InitialiseNeurons();
+            InitialiseWeights();
         }
 
         // copy network from another
@@ -27,8 +27,8 @@ namespace ML
         {
             _layers = other._layers.Clone() as int[];
 
-            InitNeurons();
-            InitWeights(false);
+            InitialiseNeurons();
+            InitialiseWeights(false);
 
             var otherGenes = other.GetFlatWeights();
             SetFlatWeights(otherGenes);
@@ -39,8 +39,8 @@ namespace ML
         {
             _layers = parent1._layers.Clone() as int[];
 
-            InitNeurons();
-            InitWeights(false);
+            InitialiseNeurons();
+            InitialiseWeights(false);
 
             var parent1Genes = parent1.GetFlatWeights();
             var parent2Genes = parent2.GetFlatWeights();
@@ -56,7 +56,7 @@ namespace ML
         }
 
         // new empty neurons
-        private void InitNeurons()
+        private void InitialiseNeurons()
         {
             _neurons = new float[_layers.Length][];
             for (var i = 0; i < _layers.Length; i++)
@@ -65,8 +65,8 @@ namespace ML
             }
         }
 
-        // random weights and zero biases
-        private void InitWeights(bool randomize = true)
+        // random weights and biases
+        private void InitialiseWeights(bool randomize = true)
         {
             _weights = new float[_layers.Length - 1][][];
             _biases = new float[_layers.Length - 1][];

@@ -22,6 +22,8 @@ namespace ML
         [Header("Generation parameters")] [SerializeField]
         private int[] _hiddenLayers = { 12 };
 
+        [field: SerializeField] public bool UseOutputsAsInput { get; private set; } = true;
+
         [SerializeField] private int _maxGenerations = 100;
         [SerializeField] private float _generationDuration = 90f;
 
@@ -31,7 +33,9 @@ namespace ML
         [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
         [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.1f;
 
-        [Header("Ship")] [SerializeField] private SpaceshipController _spaceshipPrefab;
+        [Header("Environment")] [SerializeField]
+        private SpaceshipController _spaceshipPrefab;
+
         [SerializeField] private Vector2 _spawnPosition;
         [SerializeField] private Transform _shipContainer;
 
@@ -71,7 +75,7 @@ namespace ML
         private void Start()
         {
             var networkShape = new int[_hiddenLayers.Length + 2];
-            networkShape[0] = SpaceshipController.InputCount; // inputs
+            networkShape[0] = SpaceshipController.InputCount + (UseOutputsAsInput ? SpaceshipController.OutputCount : 0); // inputs
             Array.Copy(_hiddenLayers, 0, networkShape, 1, _hiddenLayers.Length);
             networkShape[^1] = SpaceshipController.OutputCount; // outputs
 
