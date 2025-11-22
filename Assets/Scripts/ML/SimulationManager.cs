@@ -175,7 +175,7 @@ namespace ML
             }
         }
 
-        private void LaunchSimulation()
+        private void LaunchSimulation(int startingGeneration = 1)
         {
             // clear existing simulation
             foreach (var ship in _population)
@@ -185,7 +185,7 @@ namespace ML
 
             _population.Clear();
             _fitnessScores.Clear();
-            _currentGeneration = 1;
+            _currentGeneration = startingGeneration;
             _generationElapsedTime = 0f;
 
             // build new simulation
@@ -217,10 +217,10 @@ namespace ML
             Debug.Log("<color=green>Launched new simulation.</color>");
         }
 
-        public void LaunchWithOptions(SimulationOptions options)
+        public void LaunchWithOptions(SimulationOptions options, int startingGeneration = 1)
         {
             Options = options;
-            LaunchSimulation();
+            LaunchSimulation(startingGeneration);
         }
 
         private void OnSpeedValueChanged(string input)
@@ -243,7 +243,9 @@ namespace ML
                 Options.PopulationSize.ToString(),
                 Options.EliteCount.ToString(),
                 Options.MutationRate.ToString("G9"),
-                Options.MutationStrength.ToString("G9")
+                Options.MutationStrength.ToString("G9"),
+                string.Join("-", Options.HiddenLayers),
+                Options.PassOutputsToInputs.ToString(),
             };
 
             lines.Add(string.Join(",", parameters));
@@ -267,23 +269,30 @@ namespace ML
                 var decodedString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedState));
                 var lines = decodedString.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (lines.Length != _population.Count + 1)
+                var parameters = lines[0].Split(new[] { ',' });
+                Debug.Log("Pasting state with parameters: " + string.Join(", ", parameters));
+
+                var generation = int.Parse(parameters[0]);
+                var options = new SimulationOptions
                 {
-                    throw new Exception(
-                        "Invalid state data: probably different population size"
-                    );
+                    MaxGenerations = int.Parse(parameters[1]),
+                    GenerationDuration = float.Parse(parameters[2]),
+                    PopulationSize = int.Parse(parameters[3]),
+                    EliteCount = int.Parse(parameters[4]),
+                    MutationRate = float.Parse(parameters[5]),
+                    MutationStrength = float.Parse(parameters[6]),
+                    HiddenLayers = parameters[7].Split('-', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray(),
+                    PassOutputsToInputs = bool.Parse(parameters[8]),
+                };
+
+                LaunchWithOptions(options, generation);
+
+                foreach (Transform child in _shipContainer)
+                {
+                    Debug.Log(child.name);
                 }
 
-                var parameters = lines[0].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-                _currentGeneration = int.Parse(parameters[0]);
-                Options.MaxGenerations = int.Parse(parameters[1]);
-                Options.GenerationDuration = float.Parse(parameters[2]);
-                Options.PopulationSize = int.Parse(parameters[3]);
-                Options.EliteCount = int.Parse(parameters[4]);
-                Options.MutationRate = float.Parse(parameters[5]);
-                Options.MutationStrength = float.Parse(parameters[6]);
-
+                // at this point, population is initialised with correct size
                 for (var i = 0; i < _population.Count; i++)
                 {
                     var weightStrings = lines[i + 1].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -293,14 +302,11 @@ namespace ML
                     _fitnessScores[i] = 0f;
                 }
 
-                UpdateFitnessUI();
-                _restartGeneration = true;
-
                 Debug.Log("<color=green>Loaded state from clipboard.</color>");
             }
             catch (Exception e)
             {
-                Debug.LogError("<color=red>Failed to load state from clipboard: " + e.Message + "</color>");
+                Debug.LogException(e);
             }
         }
 
