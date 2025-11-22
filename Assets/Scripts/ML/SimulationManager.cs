@@ -4,6 +4,7 @@ using System.Linq;
 using Ship;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -12,26 +13,35 @@ namespace ML
 {
     public class SimulationManager : MonoBehaviour
     {
+        [Serializable]
+        public class SimulationOptions
+        {
+            public int MaxGenerations;
+            public float GenerationDuration;
+            public int PopulationSize;
+            public int EliteCount;
+            [Range(0, 1)] public float MutationRate;
+            [Range(0, 1)] public float MutationStrength;
+            public int[] HiddenLayers;
+            public bool PassOutputsToInputs;
+        }
+
         public static SimulationManager Instance { get; private set; }
 
         public bool SpeedTrainingMode { get; private set; }
 
-        [Header("Controls")] [SerializeField] private bool _runGenerationLoop = true;
-        [SerializeField] private bool _restartGeneration = true;
-
-        [Header("Generation parameters")] [SerializeField]
-        private int[] _hiddenLayers = { 12 };
-
-        [field: SerializeField] public bool UseOutputsAsInput { get; private set; } = true;
-
-        [SerializeField] private int _maxGenerations = 100;
-        [SerializeField] private float _generationDuration = 90f;
-
-        [SerializeField] private int _populationSize = 100;
-        [SerializeField] private int _eliteCount = 5;
-
-        [Range(0f, 1f)] [SerializeField] private float _mutationRate = 0.02f;
-        [Range(0f, 1f)] [SerializeField] private float _mutationStrength = 0.1f;
+        [Header("Generation parameters")]
+        [field: SerializeField]
+        public SimulationOptions Options { get; private set; } = new()
+        {
+            MaxGenerations = 100,
+            GenerationDuration = 180f,
+            PopulationSize = 100,
+            EliteCount = 5,
+            MutationRate = 0.02f,
+            MutationStrength = 0.25f,
+            HiddenLayers = new[] { 8 }
+        };
 
         [Header("Environment")] [SerializeField]
         private SpaceshipController _spaceshipPrefab;
@@ -51,11 +61,15 @@ namespace ML
 
         private CameraController _cameraController;
 
-        private int _currentGeneration = 1;
+        private int _currentGeneration;
         private float _generationElapsedTime;
+        private bool _restartGeneration; // todo i don't think we need both flags
+        private bool _runGenerationLoop; // todo ^^
 
         private List<SpaceshipController> _population;
         private List<float> _fitnessScores;
+
+        public int TotalInputCount => SpaceshipController.InputCount + (Options.PassOutputsToInputs ? SpaceshipController.OutputCount : 0);
 
         private void Awake()
         {
@@ -63,8 +77,8 @@ namespace ML
 
             _cameraController = FindAnyObjectByType<CameraController>();
 
-            _population = new List<SpaceshipController>(_populationSize);
-            _fitnessScores = new List<float>(_populationSize);
+            _population = new List<SpaceshipController>(Options.PopulationSize);
+            _fitnessScores = new List<float>(Options.PopulationSize);
 
             _speedInput.onValueChanged.AddListener(OnSpeedValueChanged);
             _copyStateButton.onClick.AddListener(OnCopyStateClicked);
@@ -72,35 +86,12 @@ namespace ML
             _viewBestButton.onClick.AddListener(OnViewBestClicked);
         }
 
-        private void Start()
-        {
-            var networkShape = new int[_hiddenLayers.Length + 2];
-            networkShape[0] = SpaceshipController.InputCount + (UseOutputsAsInput ? SpaceshipController.OutputCount : 0); // inputs
-            Array.Copy(_hiddenLayers, 0, networkShape, 1, _hiddenLayers.Length);
-            networkShape[^1] = SpaceshipController.OutputCount; // outputs
-
-            Debug.Log("Creating brains with shape " + string.Join("-", networkShape));
-
-            for (var i = 0; i < _populationSize; i++)
-            {
-                var ship = Instantiate(_spaceshipPrefab, _spawnPosition, Quaternion.identity);
-                ship.transform.parent = _shipContainer;
-
-                ship.Brain = new NeuralNetwork(networkShape);
-
-                _population.Add(ship);
-                _fitnessScores.Add(0f);
-            }
-
-            UpdateFitnessUI();
-        }
-
         private void FixedUpdate()
         {
             if (!_runGenerationLoop) return;
             _generationElapsedTime += Time.fixedDeltaTime;
 
-            var generationComplete = _generationElapsedTime >= _generationDuration;
+            var generationComplete = _generationElapsedTime >= Options.GenerationDuration;
             if (generationComplete && !_restartGeneration)
             {
                 var prevAverage = _fitnessScores.Average();
@@ -136,9 +127,9 @@ namespace ML
 
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
 
-                var maxNumDigits = _maxGenerations.ToString().Length;
+                var maxNumDigits = Options.MaxGenerations.ToString().Length;
                 var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
-                _generationText.text = $"Generation {currentGenStr} / {_maxGenerations}";
+                _generationText.text = $"Generation {currentGenStr} / {Options.MaxGenerations}";
 
                 foreach (var ship in _population)
                 {
@@ -150,16 +141,18 @@ namespace ML
             }
         }
 
-
         private void LateUpdate()
         {
-            if (Keyboard.current.digit1Key.wasPressedThisFrame) Time.timeScale = 1f;
-            if (Keyboard.current.digit2Key.wasPressedThisFrame) Time.timeScale = 5f;
-            if (Keyboard.current.digit3Key.wasPressedThisFrame) Time.timeScale = 10f;
-            if (Keyboard.current.digit4Key.wasPressedThisFrame) Time.timeScale = 60f;
-            if (Keyboard.current.digit5Key.wasPressedThisFrame) Time.timeScale = 100f;
+            if (!EventSystem.current.currentSelectedGameObject)
+            {
+                if (Keyboard.current.digit1Key.wasPressedThisFrame) Time.timeScale = 1f;
+                if (Keyboard.current.digit2Key.wasPressedThisFrame) Time.timeScale = 5f;
+                if (Keyboard.current.digit3Key.wasPressedThisFrame) Time.timeScale = 10f;
+                if (Keyboard.current.digit4Key.wasPressedThisFrame) Time.timeScale = 60f;
+                if (Keyboard.current.digit5Key.wasPressedThisFrame) Time.timeScale = 100f;
 
-            SpeedTrainingMode = Time.timeScale >= 60f;
+                SpeedTrainingMode = Time.timeScale >= 60f;
+            }
 
             if (!_speedInput.isFocused)
             {
@@ -169,7 +162,7 @@ namespace ML
             var timespan = TimeSpan.FromSeconds(_generationElapsedTime);
             _timerText.text = $"{timespan.Minutes:D2}:{timespan.Seconds:D2}.{timespan.Milliseconds:D3}";
 
-            var progress = Mathf.Clamp01(_generationElapsedTime / _generationDuration);
+            var progress = Mathf.Clamp01(_generationElapsedTime / Options.GenerationDuration);
             if (_currentGeneration % 2 == 0)
             {
                 _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Right;
@@ -180,6 +173,54 @@ namespace ML
                 _timerProgressBar.fillOrigin = (int)Image.OriginHorizontal.Left;
                 _timerProgressBar.fillAmount = progress;
             }
+        }
+
+        private void LaunchSimulation()
+        {
+            // clear existing simulation
+            foreach (var ship in _population)
+            {
+                Destroy(ship.gameObject);
+            }
+
+            _population.Clear();
+            _fitnessScores.Clear();
+            _currentGeneration = 1;
+            _generationElapsedTime = 0f;
+
+            // build new simulation
+            var networkShape = new int[Options.HiddenLayers.Length + 2];
+
+            networkShape[0] = TotalInputCount; // inputs
+            // hidden layers
+            Array.Copy(Options.HiddenLayers, 0, networkShape, 1, Options.HiddenLayers.Length);
+            networkShape[^1] = SpaceshipController.OutputCount; // outputs
+
+            Debug.Log("Creating brains with shape " + string.Join("-", networkShape));
+
+            for (var i = 0; i < Options.PopulationSize; i++)
+            {
+                var ship = Instantiate(_spaceshipPrefab, _spawnPosition, Quaternion.identity);
+                ship.transform.parent = _shipContainer;
+
+                ship.Brain = new NeuralNetwork(networkShape);
+
+                _population.Add(ship);
+                _fitnessScores.Add(0f);
+            }
+
+            UpdateFitnessUI();
+
+            _runGenerationLoop = true;
+            _restartGeneration = true;
+
+            Debug.Log("<color=green>Launched new simulation.</color>");
+        }
+
+        public void LaunchWithOptions(SimulationOptions options)
+        {
+            Options = options;
+            LaunchSimulation();
         }
 
         private void OnSpeedValueChanged(string input)
@@ -197,12 +238,12 @@ namespace ML
             var parameters = new[]
             {
                 _currentGeneration.ToString(),
-                _maxGenerations.ToString(),
-                _generationDuration.ToString("G9"),
-                _populationSize.ToString(),
-                _eliteCount.ToString(),
-                _mutationRate.ToString("G9"),
-                _mutationStrength.ToString("G9")
+                Options.MaxGenerations.ToString(),
+                Options.GenerationDuration.ToString("G9"),
+                Options.PopulationSize.ToString(),
+                Options.EliteCount.ToString(),
+                Options.MutationRate.ToString("G9"),
+                Options.MutationStrength.ToString("G9")
             };
 
             lines.Add(string.Join(",", parameters));
@@ -236,12 +277,12 @@ namespace ML
                 var parameters = lines[0].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 _currentGeneration = int.Parse(parameters[0]);
-                _maxGenerations = int.Parse(parameters[1]);
-                _generationDuration = float.Parse(parameters[2]);
-                _populationSize = int.Parse(parameters[3]);
-                _eliteCount = int.Parse(parameters[4]);
-                _mutationRate = float.Parse(parameters[5]);
-                _mutationStrength = float.Parse(parameters[6]);
+                Options.MaxGenerations = int.Parse(parameters[1]);
+                Options.GenerationDuration = float.Parse(parameters[2]);
+                Options.PopulationSize = int.Parse(parameters[3]);
+                Options.EliteCount = int.Parse(parameters[4]);
+                Options.MutationRate = float.Parse(parameters[5]);
+                Options.MutationStrength = float.Parse(parameters[6]);
 
                 for (var i = 0; i < _population.Count; i++)
                 {
@@ -273,7 +314,7 @@ namespace ML
                 return;
             }
 
-            // elitism means first _eliteCount items will be sorted best
+            // elitism means first Options.EliteCount items will be sorted best
             var bestShip = _population[0];
 
             _cameraController.FollowTarget = bestShip.transform;
@@ -351,15 +392,15 @@ namespace ML
                 .OrderByDescending(x => x.fitness)
                 .ToList();
 
-            var newBrains = new List<NeuralNetwork>(_populationSize);
+            var newBrains = new List<NeuralNetwork>(Options.PopulationSize);
 
             // keep best performers
-            for (var i = 0; i < _eliteCount; i++)
+            for (var i = 0; i < Options.EliteCount; i++)
             {
                 newBrains.Add(new NeuralNetwork(sortedPop[i].ship.Brain));
             }
 
-            while (newBrains.Count < _populationSize)
+            while (newBrains.Count < Options.PopulationSize)
             {
                 // crossover
                 // var parent1 = TournamentSelect(5);
@@ -373,9 +414,9 @@ namespace ML
                 var weights = newBrain.GetFlatWeights();
                 for (var i = 0; i < weights.Length; i++)
                 {
-                    if (Random.value < _mutationRate)
+                    if (Random.value < Options.MutationRate)
                     {
-                        weights[i] += (Random.value - Random.value) * _mutationStrength;
+                        weights[i] += (Random.value - Random.value) * Options.MutationStrength;
                     }
                 }
 

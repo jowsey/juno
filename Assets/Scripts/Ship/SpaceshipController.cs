@@ -1,6 +1,7 @@
 using System;
 using ML;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Ship
 {
@@ -75,7 +76,7 @@ namespace Ship
             _topLevelStage = GetComponent<SpaceshipStage>();
             _topLevelStage.IsRootStage = true;
 
-            _inputs = new float[InputCount + (SimulationManager.Instance.UseOutputsAsInput ? OutputCount : 0)];
+            _inputs = new float[SimulationManager.Instance.TotalInputCount];
             _lastOutputs = new float[OutputCount];
         }
 
@@ -141,7 +142,7 @@ namespace Ship
             _inputs[9] = _heavyStageGroup.Separated ? 1 : 0;
             _inputs[10] = _boosterStageGroup.Separated ? 1 : 0;
 
-            if (SimulationManager.Instance.UseOutputsAsInput)
+            if (SimulationManager.Instance.Options.PassOutputsToInputs)
             {
                 Array.Copy(_lastOutputs, 0, _inputs, InputCount, OutputCount);
             }
@@ -214,6 +215,25 @@ namespace Ship
             _boosterStageGroup.ReinitialiseAll();
             _heavyStageGroup.ReinitialiseAll();
             _topLevelStage.Reinitialise();
+        }
+
+        private void OnDestroy()
+        {
+            if (_boosterStageGroup.Separated)
+            {
+                foreach (var stage in _boosterStageGroup.Stages)
+                {
+                    Destroy(stage.gameObject);
+                }
+            }
+
+            if (_heavyStageGroup.Separated)
+            {
+                foreach (var stage in _heavyStageGroup.Stages)
+                {
+                    Destroy(stage.gameObject);
+                }
+            }
         }
     }
 }
