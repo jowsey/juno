@@ -108,6 +108,8 @@ namespace ML
 
                 if (newMax < prevMax)
                 {
+                    // fwiw, i think 99% of the time this is just due to floating point (im)precision (and accumulation thereof), sadly
+                    // every warning i get atp is for, like, 0.000016 -> 0.000015
                     Debug.LogWarning(
                         "<color=orange>Max fitness dropped - determinism broken?</color> " +
                         $"<color=green>{prevMax:G9}</color> -> <color=red>{newMax:G9}</color>"
@@ -130,6 +132,8 @@ namespace ML
                 var maxNumDigits = Options.MaxGenerations.ToString().Length;
                 var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
                 _generationText.text = $"Generation {currentGenStr} / {Options.MaxGenerations}";
+
+                Physics2D.SyncTransforms(); // this one is probably unnecessary but im fighting for my life in the reproducibility wars rn
 
                 foreach (var ship in _population)
                 {

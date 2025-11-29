@@ -76,6 +76,7 @@ namespace Ship
             SteeringControl = 0f;
             StoredZRot = 0f;
             transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            SetParticleRatio(0f, true);
         }
     }
 }
