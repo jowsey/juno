@@ -58,6 +58,11 @@ namespace ML
         [SerializeField] private Button _pasteStateButton;
         [SerializeField] private Button _viewBestButton;
         [SerializeField] private TextMeshProUGUI _viewBestButtonText;
+        [SerializeField] private Slider _mutationRateSlider;
+        [SerializeField] private Slider _mutationStrengthSlider;
+
+        [SerializeField] private RectTransform _simUI;
+        [SerializeField] private RectTransform _setupUI;
 
         private CameraController _cameraController;
 
@@ -74,6 +79,9 @@ namespace ML
         private void Awake()
         {
             Instance = this;
+            
+            _simUI.gameObject.SetActive(false);
+            _setupUI.gameObject.SetActive(true);
 
             _cameraController = FindAnyObjectByType<CameraController>();
 
@@ -84,6 +92,8 @@ namespace ML
             _copyStateButton.onClick.AddListener(OnCopyStateClicked);
             _pasteStateButton.onClick.AddListener(OnPasteStateClicked);
             _viewBestButton.onClick.AddListener(OnViewBestClicked);
+            _mutationRateSlider.onValueChanged.AddListener(OnMutationRateChanged);
+            _mutationStrengthSlider.onValueChanged.AddListener(OnMutationStrengthChanged);
         }
 
         private void FixedUpdate()
@@ -330,6 +340,16 @@ namespace ML
             _cameraController.FollowTarget = bestShip.transform;
             _viewBestButtonText.text = "Stop viewing";
             Debug.Log($"Following best ship with fitness of {_fitnessScores[0]:F3}).");
+        }
+
+        private void OnMutationRateChanged(float value)
+        {
+            Options.MutationRate = value / 100f;
+        }
+
+        private void OnMutationStrengthChanged(float value)
+        {
+            Options.MutationStrength = value / 100f;
         }
 
         private void UpdateFitnessUI(float prevAverage = 0f, float prevMax = 0f)
