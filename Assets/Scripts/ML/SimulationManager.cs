@@ -79,7 +79,7 @@ namespace ML
         private void Awake()
         {
             Instance = this;
-            
+
             _simUI.gameObject.SetActive(false);
             _setupUI.gameObject.SetActive(true);
 
@@ -234,6 +234,10 @@ namespace ML
         public void LaunchWithOptions(SimulationOptions options, int startingGeneration = 1)
         {
             Options = options;
+
+            _mutationRateSlider.value = Options.MutationRate * 100f;
+            _mutationStrengthSlider.value = Options.MutationStrength * 100f;
+
             LaunchSimulation(startingGeneration);
         }
 
