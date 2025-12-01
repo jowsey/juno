@@ -1174,7 +1174,7 @@ Transform:
   m_GameObject: {fileID: 432811300}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.000027, y: -0.000012, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.4999999, y: 1.4999999, z: 1.4999999}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -3233,7 +3233,7 @@ MonoBehaviour:
     HiddenLayers: 08000000
     PassOutputsToInputs: 0
   _spaceshipPrefab: {fileID: 7247496989856108138, guid: e086e47e1897443f298d2392860d479a, type: 3}
-  _spawnPosition: {x: 0, y: 12.1}
+  _spawnPosition: {x: 0, y: -2487.9}
   _shipContainer: {fileID: 1911069517}
   _timerText: {fileID: 1452712751}
   _timerProgressBar: {fileID: 620336837}
@@ -4416,7 +4416,7 @@ Transform:
   m_GameObject: {fileID: 1852277583}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -10000, z: 0}
+  m_LocalPosition: {x: 0, y: -12500, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4896,7 +4896,7 @@ Transform:
   m_GameObject: {fileID: 1916569364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 9, z: -10}
+  m_LocalPosition: {x: 0, y: -2491, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
