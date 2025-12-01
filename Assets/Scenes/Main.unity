@@ -3228,7 +3228,7 @@ MonoBehaviour:
     GenerationDuration: 180
     PopulationSize: 100
     EliteCount: 5
-    MutationRate: 0.02
+    MutationRate: 0.05
     MutationStrength: 0.25
     HiddenLayers: 08000000
     PassOutputsToInputs: 0
