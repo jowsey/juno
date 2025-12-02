@@ -16,7 +16,6 @@ namespace ML
         [Serializable]
         public class SimulationOptions
         {
-            public int MaxGenerations;
             public float GenerationDuration;
             public int PopulationSize;
             public int EliteCount;
@@ -34,7 +33,6 @@ namespace ML
         [field: SerializeField]
         public SimulationOptions Options { get; private set; } = new()
         {
-            MaxGenerations = 100,
             GenerationDuration = 180f,
             PopulationSize = 100,
             EliteCount = 5,
@@ -138,10 +136,7 @@ namespace ML
                 _restartGeneration = false;
 
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
-
-                var maxNumDigits = Options.MaxGenerations.ToString().Length;
-                var currentGenStr = _currentGeneration.ToString().PadLeft(maxNumDigits, '0');
-                _generationText.text = $"Generation {currentGenStr} / {Options.MaxGenerations}";
+                _generationText.text = $"Generation {_currentGeneration}";
 
                 Physics2D.SyncTransforms(); // this one is probably unnecessary but im fighting for my life in the reproducibility wars rn
 
@@ -256,7 +251,6 @@ namespace ML
             var parameters = new[]
             {
                 _currentGeneration.ToString(),
-                Options.MaxGenerations.ToString(),
                 Options.GenerationDuration.ToString("G9"),
                 Options.PopulationSize.ToString(),
                 Options.EliteCount.ToString(),
@@ -293,14 +287,13 @@ namespace ML
                 var generation = int.Parse(parameters[0]);
                 var options = new SimulationOptions
                 {
-                    MaxGenerations = int.Parse(parameters[1]),
-                    GenerationDuration = float.Parse(parameters[2]),
-                    PopulationSize = int.Parse(parameters[3]),
-                    EliteCount = int.Parse(parameters[4]),
-                    MutationRate = float.Parse(parameters[5]),
-                    MutationStrength = float.Parse(parameters[6]),
-                    HiddenLayers = parameters[7].Split('-', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray(),
-                    PassOutputsToInputs = bool.Parse(parameters[8]),
+                    GenerationDuration = float.Parse(parameters[1]),
+                    PopulationSize = int.Parse(parameters[2]),
+                    EliteCount = int.Parse(parameters[3]),
+                    MutationRate = float.Parse(parameters[4]),
+                    MutationStrength = float.Parse(parameters[5]),
+                    HiddenLayers = parameters[6].Split('-', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray(),
+                    PassOutputsToInputs = bool.Parse(parameters[7]),
                 };
 
                 LaunchWithOptions(options, generation);

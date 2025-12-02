@@ -10,7 +10,6 @@ namespace UI
 {
     public class SetupForm : MonoBehaviour
     {
-        [SerializeField] private TMP_InputField _maxGenerationsInput;
         [SerializeField] private TMP_InputField _generationDurationInput;
         [SerializeField] private TMP_InputField _populationSizeInput;
         [SerializeField] private TMP_InputField _eliteCountInput;
@@ -28,7 +27,6 @@ namespace UI
         {
             var currentOptions = SimulationManager.Instance.Options;
 
-            _maxGenerationsInput.text = currentOptions.MaxGenerations.ToString();
             _generationDurationInput.text = currentOptions.GenerationDuration.ToString(CultureInfo.InvariantCulture);
             _populationSizeInput.text = currentOptions.PopulationSize.ToString();
             _eliteCountInput.text = currentOptions.EliteCount.ToString();
@@ -39,7 +37,6 @@ namespace UI
 
             UpdatePassOutputsToInputs(currentOptions.PassOutputsToInputs);
 
-            _maxGenerationsInput.onEndEdit.AddListener(_ => ValidateIntField(_maxGenerationsInput, 1));
             _generationDurationInput.onEndEdit.AddListener(_ => ValidateFloatField(_generationDurationInput, 1));
             _populationSizeInput.onEndEdit.AddListener(_ => ValidateIntField(_populationSizeInput, 2));
             _eliteCountInput.onEndEdit.AddListener(_ => ValidateIntField(_eliteCountInput, 0));
@@ -89,7 +86,6 @@ namespace UI
 
         private void OnSubmit()
         {
-            var maxGenerations = int.Parse(_maxGenerationsInput.text);
             var generationDuration = int.Parse(_generationDurationInput.text);
             var populationSize = int.Parse(_populationSizeInput.text);
             var eliteCount = int.Parse(_eliteCountInput.text);
@@ -100,7 +96,6 @@ namespace UI
 
             var options = new SimulationManager.SimulationOptions
             {
-                MaxGenerations = maxGenerations,
                 GenerationDuration = generationDuration,
                 PopulationSize = populationSize,
                 EliteCount = eliteCount,
