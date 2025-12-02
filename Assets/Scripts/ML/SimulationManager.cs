@@ -114,7 +114,7 @@ namespace ML
 
                 var newMax = _fitnessScores.Max();
 
-                if (newMax < prevMax)
+                if (newMax < prevMax - 0.00001f)
                 {
                     // fwiw, i think 99% of the time this is just due to floating point (im)precision (and accumulation thereof), sadly
                     // every warning i get atp is for, like, 0.000016 -> 0.000015
@@ -138,7 +138,11 @@ namespace ML
                 Debug.Log($"<color=green>Running generation <b>{_currentGeneration}</b></color>");
                 _generationText.text = $"Generation {_currentGeneration}";
 
-                Physics2D.SyncTransforms(); // this one is probably unnecessary but im fighting for my life in the reproducibility wars rn
+                foreach (var ship in _population)
+                {
+                    // prevent some ships somehow ticking during reset
+                    ship.gameObject.SetActive(false);
+                }
 
                 foreach (var ship in _population)
                 {
@@ -388,10 +392,9 @@ namespace ML
             // tiny reward for getting higher up to nudge off the ground
             fitness += ship.HighestAtmosphereProgress * 0.01f;
 
-            var planetPos = env.PlanetPosition.normalized;
             var angle = Vector2.Angle(
-                _spawnPosition.normalized - planetPos,
-                position.normalized - planetPos
+                (_spawnPosition - env.PlanetPosition).normalized,
+                (position - env.PlanetPosition).normalized
             );
 
             // another tiny reward for going further around the planet
