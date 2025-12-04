@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 036f3f05cb0cc496c90eb023f48dca02, type: 3}
   m_Parent: {fileID: 2100000, guid: b2558b9272c40407d8c23aed73a46e50, type: 2}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _USE_RADIAL_FADE
   m_InvalidKeywords:
   - USE_RADIAL_FADE
   m_LightmapFlags: 4

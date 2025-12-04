@@ -1,7 +1,7 @@
 using System;
+using System.Linq;
 using ML;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Ship
 {
@@ -16,7 +16,7 @@ namespace Ship
             var total = 0f;
             foreach (var stage in Stages)
             {
-                total += stage.GetFuelRemaining();
+                total += stage.GetFuelRemainingRatio();
             }
 
             return total / Stages.Length;
@@ -136,7 +136,7 @@ namespace Ship
             _inputs[3] = (float)Math.Tanh(Rb.angularVelocity / 45f);
             _inputs[4] = Mathf.Sin(relativeRotation * Mathf.Deg2Rad);
             _inputs[5] = Mathf.Cos(relativeRotation * Mathf.Deg2Rad);
-            _inputs[6] = _topLevelStage.GetFuelRemaining();
+            _inputs[6] = _topLevelStage.GetFuelRemainingRatio();
             _inputs[7] = !_heavyStageGroup.Separated ? _heavyStageGroup.GetAverageFuelRemaining() : 0;
             _inputs[8] = !_boosterStageGroup.Separated ? _boosterStageGroup.GetAverageFuelRemaining() : 0;
             _inputs[9] = _heavyStageGroup.Separated ? 1 : 0;
@@ -149,10 +149,12 @@ namespace Ship
 
             var outputs = Brain.FeedForward(_inputs);
 
+            const float stageConfidenceThreshold = 0.5f;
+
             var thrustControl = outputs[0] * 0.5f + 0.5f;
             var steeringControl = outputs[1];
-            var separateBoosterStage = outputs[2] > 0.5f;
-            var separateHeavyStage = outputs[3] > 0.5f;
+            var separateBoosterStage = outputs[2] > stageConfidenceThreshold;
+            var separateHeavyStage = outputs[3] > stageConfidenceThreshold;
 
             Array.Copy(outputs, _lastOutputs, OutputCount);
 
@@ -217,6 +219,19 @@ namespace Ship
             _boosterStageGroup.ReinitialiseAll();
             _heavyStageGroup.ReinitialiseAll();
             _topLevelStage.Reinitialise();
+        }
+
+        public float GetFuelRemainingRatio()
+        {
+            var totalPossible = _topLevelStage.GetTotalFuelKg()
+                                + _heavyStageGroup.Stages.Sum(stage => stage.GetTotalFuelKg())
+                                + _boosterStageGroup.Stages.Sum(stage => stage.GetTotalFuelKg());
+
+            var totalRemaining = _topLevelStage.GetFuelRemainingKg();
+            if (!_heavyStageGroup.Separated) totalRemaining += _heavyStageGroup.Stages.Sum(stage => stage.GetFuelRemainingKg());
+            if (!_boosterStageGroup.Separated) totalRemaining += _boosterStageGroup.Stages.Sum(stage => stage.GetFuelRemainingKg());
+
+            return totalRemaining / totalPossible;
         }
 
         private void OnDestroy()

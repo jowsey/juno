@@ -390,7 +390,8 @@ namespace ML
             var periapsisProgress = orbit.Periapsis / goalOrbitAltitude;
 
             // tiny reward for getting higher up to nudge off the ground
-            fitness += ship.HighestAtmosphereProgress * 0.01f;
+            const float maxAtmosphereFitness = 0.01f;
+            fitness += ship.HighestAtmosphereProgress * maxAtmosphereFitness;
 
             var angle = Vector2.Angle(
                 (_spawnPosition - env.PlanetPosition).normalized,
@@ -398,18 +399,29 @@ namespace ML
             );
 
             // another tiny reward for going further around the planet
-            fitness += Mathf.Clamp01(angle / 180f) * 0.01f;
+            const float maxAngleFitness = 0.01f;
+            fitness += Mathf.Clamp01(angle / 180f) * maxAngleFitness;
 
             // reward for higher periapsis
             fitness += periapsisProgress;
 
             // bonus for more circular orbits
-            fitness += Mathf.Clamp01(1f - orbit.Eccentricity) * 2f;
+            const float maxEccentricityFitness = 2f;
+            fitness += Mathf.Clamp01(1f - orbit.Eccentricity) * maxEccentricityFitness;
 
-            // immediately reward any kind of stable orbit
+            // immediately reward any kind of stable orbit (ultimate goal)
             if (orbit.IsStable)
             {
-                fitness += 5f;
+                fitness += 1f;
+
+                // slightly reward not using as much fuel
+                const float maxFuelFitness = 0.1f;
+                fitness += ship.GetFuelRemainingRatio() * maxFuelFitness;
+
+                // reward not ending up in a spin
+                const float maxAntiSpinFitness = 0.2f;
+                var angularSpeed = Mathf.Abs(ship.Rb.angularVelocity);
+                fitness += Mathf.Clamp01(1f - (angularSpeed / 360f)) * maxAntiSpinFitness;
             }
 
             return fitness;

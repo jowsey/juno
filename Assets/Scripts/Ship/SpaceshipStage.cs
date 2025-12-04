@@ -128,7 +128,7 @@ namespace Ship
         }
 
         // normalized amount of fuel remaining relative to max
-        public float GetFuelRemaining()
+        public float GetFuelRemainingRatio()
         {
             var totalFuel = 0f;
             var totalFuelCapacity = 0f;
@@ -142,6 +142,29 @@ namespace Ship
             if (totalFuelCapacity <= 0f) return 0f;
 
             return totalFuel / totalFuelCapacity;
+        }
+
+        public float GetFuelRemainingKg()
+        {
+            var totalFuel = 0f;
+            foreach (var tank in _fuelTanks)
+            {
+                totalFuel += tank.StoredFuelKg;
+            }
+
+            return totalFuel;
+        }
+
+        public float GetTotalFuelKg()
+        {
+            var totalFuel = 0f;
+
+            foreach (var tank in _fuelTanks)
+            {
+                totalFuel += tank.StoredFuelKg;
+            }
+
+            return totalFuel;
         }
 
         public void SetThrustControl(float level)
